@@ -1,18 +1,64 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
 import { Link } from 'preact-router/match';
-import style from './style';
+import styled from 'preact-emotion';
 
-export default class Header extends Component {
-	render() {
-		return (
-			<header class={style.header}>
-				<h1>Preact App</h1>
-				<nav>
-					<Link activeClassName={style.active} href="/">Home</Link>
-					<Link activeClassName={style.active} href="/profile">Me</Link>
-					<Link activeClassName={style.active} href="/profile/john">John</Link>
-				</nav>
-			</header>
-		);
-	}
+const HeaderContainer = styled('header')`
+  display: flex;
+  width: 100%;
+  height: 3.5rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  ${({ border }) =>
+    border && 'border-bottom: 1px solid rgba(50, 50, 50, 0.25)'};
+
+  @media (max-width: 48rem) {
+    padding-bottom: 1rem;
+    flex-direction: column;
+    height: auto;
+  }
+`;
+
+const Nav = styled('nav')`
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+
+  a {
+    margin: 0;
+    margin-left: 1rem;
+  }
+
+  @media (max-width: 30rem) {
+    flex-direction: column;
+    text-align: center;
+
+    a {
+      margin: 0;
+      margin-top: 1rem;
+    }
+  }
+`;
+
+export default function Header({ isHome }) {
+  const NAV_LINKS = {
+    '/projects': 'Projects',
+    '/experiences': 'Experiences'
+  };
+
+  return (
+    <HeaderContainer border={isHome}>
+      {isHome && (
+        <Link href="/" activeClassName="active">
+          <h1>rkkautsar.</h1>
+        </Link>
+      )}
+      <Nav>
+        {Object.entries(NAV_LINKS).map(([path, label]) => (
+          <Link key={path} href={path} activeClassName="active">
+            {label}
+          </Link>
+        ))}
+      </Nav>
+    </HeaderContainer>
+  );
 }

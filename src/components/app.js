@@ -1,31 +1,21 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
 import { Router } from 'preact-router';
+import { Match } from 'preact-router/match';
 
 import Header from './header';
-import Home from '../routes/home';
-import Profile from '../routes/profile';
-// import Home from 'async!../routes/home';
-// import Profile from 'async!../routes/profile';
+import Home from 'async!../routes/home';
+import Projects from 'async!../routes/projects';
+import Experiences from 'async!../routes/experiences';
 
-export default class App extends Component {
-	/** Gets fired when the route changes.
-	 *	@param {Object} event		"change" event from [preact-router](http://git.io/preact-router)
-	 *	@param {string} event.url	The newly routed URL
-	 */
-	handleRoute = e => {
-		this.currentUrl = e.url;
-	};
-
-	render() {
-		return (
-			<div id="app">
-				<Header />
-				<Router onChange={this.handleRoute}>
-					<Home path="/" />
-					<Profile path="/profile/" user="me" />
-					<Profile path="/profile/:user" />
-				</Router>
-			</div>
-		);
-	}
+export default function App() {
+  return (
+    <div id="app">
+      <Match>{({ path }) => <Header isHome={path !== '/'} />}</Match>
+      <Router>
+        <Home path="/" />
+        <Projects path="/projects" />
+        <Experiences path="/experiences" />
+      </Router>
+    </div>
+  );
 }

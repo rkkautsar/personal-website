@@ -5,27 +5,28 @@
   "license": "MIT",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "preact build",
-    "serve": "preact build && preact serve",
-    "dev": "preact watch",
+    "build": "preact build --template src/template.html",
+    "serve": "npm run -s build && preact serve",
+    "dev": "preact watch --template src/template.html",
     "lint": "eslint src"
   },
   "eslintConfig": {
-    "extends": "eslint-config-synacor"
+    "extends": "airbnb"
   },
   "eslintIgnore": [
     "build/*"
   ],
   "devDependencies": {
     "eslint": "^4.9.0",
-    "eslint-config-synacor": "^2.0.2",
     "if-env": "^1.0.0",
-    "preact-cli": "^2.0.1"
+    "preact-cli": "^2.0.1",
+    "prettier-eslint": "^8.8.1"
   },
   "dependencies": {
+    "emotion": "^8.0.12",
     "preact": "^8.2.6",
-    "preact-compat": "^3.17.0",
     "preact-emotion": "^8.0.12",
-    "preact-router": "^2.5.7"
+    "preact-router": "^2.5.7",
+    "webfontloader": "^1.6.28"
   }
 }

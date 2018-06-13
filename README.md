@@ -1,4 +1,4 @@
-# {{ name }}
+# rkkautsar.github.io
 
 ## CLI Commands
 
