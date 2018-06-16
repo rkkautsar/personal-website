@@ -12,6 +12,7 @@ const socials = {
 const HomeContainer = styled("main")`
   flex: 1;
   display: flex;
+  overflow-y: auto;
   flex-direction: column;
   justify-content: center;
   align-items: center;
