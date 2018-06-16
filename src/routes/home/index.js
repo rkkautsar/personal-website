@@ -10,7 +10,7 @@ const socials = {
 };
 
 const HomeContainer = styled("main")`
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -64,6 +64,7 @@ const Button = styled("a")`
 const Row = styled("div")`
   display: flex;
   flex-direction: row;
+  flex-shrink: 0;
   margin: 1rem;
 
   * + * {
@@ -85,14 +86,20 @@ const IconLink = styled('a')`
   }
 `;
 
+const AvatarContainer = styled('div')`
+  display: flex;
+`;
+
 
 export default function Home() {
   return (
     <HomeContainer>
-      <Avatar
-        src="https://avatars2.githubusercontent.com/u/1536976"
-        alt="avatar"
-      />
+      <AvatarContainer>
+        <Avatar
+          src="https://avatars2.githubusercontent.com/u/1536976"
+          alt="avatar"
+        />
+      </AvatarContainer>
       <h1>Hi, I'm Rakha Kanz Kautsar</h1>
       <Subtitle>A full-stack software engineer thriving for impact.</Subtitle>
       <Row>

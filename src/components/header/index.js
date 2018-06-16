@@ -5,7 +5,8 @@ import styled from 'preact-emotion';
 const HeaderContainer = styled('header')`
   display: flex;
   width: 100%;
-  height: 3.5rem;
+  min-height: 3.5rem;
+  flex-shrink: 0;
   margin-bottom: 1rem;
   align-items: center;
   ${({ border }) =>
