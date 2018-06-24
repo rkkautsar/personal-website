@@ -1,4 +1,4 @@
-# rkkautsar.github.io
+# [rakha.tech](https://rakha.tech)
 
 ## CLI Commands
 
