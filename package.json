@@ -29,6 +29,7 @@
     "preact": "^8.2.6",
     "preact-emotion": "^8.0.12",
     "preact-router": "^2.5.7",
+    "react-ga": "^2.5.3",
     "webfontloader": "^1.6.28"
   }
 }

@@ -32,7 +32,7 @@ export default {
         },
         {
           title: 'STOQO Task Management',
-          description: 'An application with two client: Mobile and Web, developed to ease and streamline the operational team task management.',
+          description: 'An application with two client: Mobile and Web, developed to ease and streamline the operational team task management, from picking items from suppliers to deliver them to customers.',
           tags: [
             'React',
             'React Native',

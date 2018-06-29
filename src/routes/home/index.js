@@ -1,6 +1,7 @@
 import { h } from "preact";
 import styled, { injectGlobal } from "preact-emotion";
 import { getSVGIconUrl } from "../../utils";
+import OutboundLink from "../../components/OutboundLink";
 
 const socials = {
   medium: "https://medium.com/@rkkautsar",
@@ -31,7 +32,7 @@ const Subtitle = styled("h3")`
   font-weight: 400;
 `;
 
-const Button = styled("a")`
+const Button = styled(OutboundLink)`
   text-transform: uppercase;
   padding: 0.4rem 2rem;
   border: 0.15rem solid #f28628;
@@ -72,7 +73,7 @@ const Row = styled("div")`
   }
 `;
 
-const IconLink = styled('a')`
+const IconLink = styled(OutboundLink)`
   opacity: .5;
   transition: opacity .5s ease-in-out;
 
@@ -101,19 +102,19 @@ export default function Home() {
         />
       </AvatarContainer>
       <h1>Hi, I'm Rakha Kanz Kautsar</h1>
-      <Subtitle>A full-stack software engineer thriving for impact.</Subtitle>
+      <Subtitle>A full-stack software engineer striving for impact.</Subtitle>
       <Row>
-        <Button href="//bit.ly/rakha-resume" target="_blank">
+        <Button to="//bit.ly/rakha-resume" eventLabel="resume" target="_blank">
           Resume
         </Button>
-        <Button filled href="mailto:rkkautsar@gmail.com">
+        <Button filled eventLabel="email" to="mailto:rkkautsar@gmail.com">
           Contact
         </Button>
       </Row>
       <Row>
         {Object.keys(socials).map(social => (
-          <IconLink href={socials[social]} target="_blank">
-            <img src={getSVGIconUrl(social)} alt={social} />
+          <IconLink to={socials[social]} eventLabel={`${social}_from_social_icon`} target="_blank">
+            <img src={getSVGIconUrl(social)} alt={social} title={social} />
           </IconLink>
         ))}
       </Row>
