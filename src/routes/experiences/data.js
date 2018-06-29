@@ -2,7 +2,7 @@ export default {
   companies: [
     {
       name: "STOQO",
-      link: "https://stoqo.com/",
+      link: "https://www.stoqo.com/",
       current: true,
       title: 'Software Engineer Intern & Part Time',
       works: [
