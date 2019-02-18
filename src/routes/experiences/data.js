@@ -1,9 +1,15 @@
 export default {
   companies: [
     {
+      name: "Fakultat Informatik, Technische Universität Dresden",
+      link: "https://iccl.inf.tu-dresden.de",
+      current: true,
+      title: "Undergraduate Research Intern"
+    },
+    {
       name: "STOQO",
       link: "https://www.stoqo.com/",
-      current: true,
+      current: false,
       title: 'Software Engineer Intern & Part Time',
       works: [
         {
@@ -31,8 +37,8 @@ export default {
           ]
         },
         {
-          title: 'STOQO Task Management',
-          description: 'An application with two client: Mobile and Web, developed to ease and streamline the operational team task management, from picking items from suppliers to deliver them to customers.',
+          title: 'STOQO Task & Driver Management',
+          description: 'An application with two client: Mobile and Web, developed to simplify and streamline the operational team daily works, from picking items from suppliers to deliver them to the customer doorstep.',
           tags: [
             'React',
             'React Native',

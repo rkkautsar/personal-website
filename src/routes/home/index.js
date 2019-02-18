@@ -102,13 +102,16 @@ export default function Home() {
         />
       </AvatarContainer>
       <h1>Hi, I'm Rakha Kanz Kautsar</h1>
-      <Subtitle>A full-stack software engineer striving for impact.</Subtitle>
+      <Subtitle>Full-stack software engineer striving for impact.</Subtitle>
       <Row>
         <Button to="//bit.ly/rakha-resume" eventLabel="resume" target="_blank">
           Resume
         </Button>
-        <Button filled eventLabel="email" to="mailto:rkkautsar@gmail.com">
-          Contact
+        <Button to="//blog.rakha.tech" eventLabel="blog" target="_blank">
+          Writings
+        </Button>
+        <Button filled eventLabel="email" to="//rkkautsar.typeform.com/to/P1p2R7">
+          Contact me!
         </Button>
       </Row>
       <Row>
