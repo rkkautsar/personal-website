@@ -4,7 +4,8 @@ export default {
       name: "Fakultat Informatik, Technische Universität Dresden",
       link: "https://iccl.inf.tu-dresden.de",
       current: true,
-      title: "Undergraduate Research Intern"
+      title: "Undergraduate Research Intern",
+      works: [],
     },
     {
       name: "STOQO",

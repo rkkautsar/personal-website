@@ -91,6 +91,17 @@ const AvatarContainer = styled('div')`
   display: flex;
 `;
 
+const ResponsiveRow = styled(Row)`
+  @media screen and (max-width: 36rem) {
+    flex-direction: column;
+
+    * + * {
+      margin-left: 0;
+      margin-top: 1rem;
+    }
+  }
+`;
+
 
 export default function Home() {
   return (
@@ -103,7 +114,7 @@ export default function Home() {
       </AvatarContainer>
       <h1>Hi, I'm Rakha Kanz Kautsar</h1>
       <Subtitle>Full-stack software engineer striving for impact.</Subtitle>
-      <Row>
+      <ResponsiveRow>
         <Button to="//bit.ly/rakha-resume" eventLabel="resume" target="_blank">
           Resume
         </Button>
@@ -113,7 +124,7 @@ export default function Home() {
         <Button filled eventLabel="email" to="//rkkautsar.typeform.com/to/P1p2R7">
           Contact me!
         </Button>
-      </Row>
+      </ResponsiveRow>
       <Row>
         {Object.keys(socials).map(social => (
           <IconLink to={socials[social]} eventLabel={`${social}_from_social_icon`} target="_blank">
