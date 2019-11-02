@@ -18,7 +18,7 @@
   ],
   "devDependencies": {
     "copy-webpack-plugin": "^4.6.0",
-    "eslint": "^5.16.0",
+    "eslint": "^6.6.0",
     "if-env": "^1.0.4",
     "preact-cli": "^2.2.1",
     "preact-cli-plugin-critical-css": "^0.1.0",
