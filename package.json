@@ -22,7 +22,7 @@
     "if-env": "^1.0.4",
     "preact-cli": "^2.2.1",
     "preact-cli-plugin-critical-css": "^0.1.0",
-    "prettier-eslint": "^8.8.2"
+    "prettier-eslint": "^9.0.1"
   },
   "dependencies": {
     "emotion": "^8.0.12",
