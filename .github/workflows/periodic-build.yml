@@ -1,0 +1,15 @@
+name: Periodic build
+
+on:
+  schedule:
+    - cron: 0 0 * * 1 # 00:00 every monday
+
+jobs:
+  trigger_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to vercel hook
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_HOOK_URL }}
+        run: |
+          curl -X POST "$HOOK_URL"
