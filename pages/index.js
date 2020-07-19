@@ -1,6 +1,41 @@
-import Head from 'next/head'
+import Head from "next/head";
+import { request } from "../services/github";
 
-export default function Home() {
+export async function getStaticProps() {
+  try {
+    // GraphQL
+    const github = await request(`
+      {
+        user(login: "rkkautsar") {
+          url
+          avatarUrl
+          pinnedItems(first: 5) {
+            edges {
+              node {
+                ... on Repository {
+                  name
+                  url
+                  description
+                  updatedAt
+                }
+              }
+            }
+          }
+        }
+      }
+    `);
+    return {
+      props: {
+        github,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+export default function Home(props) {
   return (
     <div className="container">
       <Head>
@@ -16,6 +51,13 @@ export default function Home() {
         <p className="description">
           Get started by editing <code>pages/index.js</code>
         </p>
+
+        {JSON.stringify(props.github, null, 2)}
+        <img
+          className="avatar"
+          src={props.github.user.avatarUrl}
+          alt="Rakha's avatar"
+        />
 
         <div className="grid">
           <a href="https://nextjs.org/docs" className="card">
@@ -54,12 +96,18 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
         </a>
       </footer>
 
       <style jsx>{`
+        .avatar {
+          width: 8rem;
+          height: 8rem;
+          border-radius: 100%;
+        }
+
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
@@ -205,5 +253,5 @@ export default function Home() {
         }
       `}</style>
     </div>
-  )
+  );
 }
