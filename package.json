@@ -8,13 +8,17 @@
     "start": "next start"
   },
   "dependencies": {
-    "graphql-request": "^2.0.0",
+    "graphql": "^15.3.0",
+    "graphql-request": "^3.2.0",
     "next": "9.4.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "swr": "^0.2.3"
+    "tailwindcss": "^1.9.3"
   },
   "devDependencies": {
-    "prettier": "^2.0.5"
+    "@types/node": "^14.11.10",
+    "@types/react": "^16.9.53",
+    "prettier": "^2.0.5",
+    "typescript": "^4.0.3"
   }
 }
