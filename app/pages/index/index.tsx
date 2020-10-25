@@ -1,7 +1,7 @@
-import * as React from "react";
-import Head from "next/head";
-import { requestSummary } from "lib/services/github";
-import "./index.module.css";
+import * as React from 'react';
+import Head from 'next/head';
+import { requestSummary } from 'lib/services/github';
+import './index.module.css';
 
 export async function getStaticProps() {
   try {
@@ -14,7 +14,7 @@ export async function getStaticProps() {
     };
   } catch (error) {
     console.error(error);
-    if (process.env.NODE_ENV !== "development") {
+    if (process.env.NODE_ENV !== 'development') {
       process.exit(1);
     }
   }
