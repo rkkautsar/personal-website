@@ -1,6 +1,7 @@
 import "./style.css";
 import * as React from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 
 let ga: firebase.analytics.Analytics | null = null;
 if (typeof window !== "undefined") {
@@ -31,7 +32,14 @@ function MyApp({ Component, pageProps }) {
     };
   }, []);
 
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Head>
+        <script async src="https://cdn.splitbee.io/sb.js"></script>
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
 }
 
 export default MyApp;
