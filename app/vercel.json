@@ -6,7 +6,23 @@
     },
     {
       "source": "/blog",
-      "destination": "https://blog.rakha.dev"
+      "destination": "https://medium.com/@rkkautsar"
+    },
+    {
+      "source": "/linkedin",
+      "destination": "https://www.linkedin.com/in/rkkautsar/"
+    },
+    {
+      "source": "/twitter",
+      "destination": "http://twitter.com/rkkautsar"
+    },
+    {
+      "source": "/github",
+      "destination": "https://github.com/rkkautsar"
+    },
+    {
+      "source": "/instagram",
+      "destination": "http://instagram.com/rakhakk"
     }
   ]
 }

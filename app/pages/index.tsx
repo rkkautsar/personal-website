@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Head from 'next/head';
 import { requestSummary } from 'lib/services/github';
+import Image from 'next/image';
 import './index.module.css';
 
 export async function getStaticProps() {
@@ -19,6 +20,25 @@ export async function getStaticProps() {
     }
   }
 }
+
+const socials = [
+  {
+    name: 'linkedin',
+    logo: 'logo-linkedin.svg',
+  },
+  {
+    name: 'twitter',
+    logo: 'logo-twitter.svg',
+  },
+  {
+    name: 'instagram',
+    logo: 'logo-instagram.svg',
+  },
+  {
+    name: 'github',
+    logo: 'logo-github.svg',
+  },
+];
 
 export default function Home(props) {
   return (
@@ -41,18 +61,47 @@ export default function Home(props) {
         <p className="text-gray-600">{props.github.user.bio}</p>
       </header>
 
+      <section className="grid gap-2 grid-flow-col place-content-center md:place-content-start">
+        {socials.map((social) => (
+          <a
+            key={social.name}
+            role="button"
+            href={`/${social.name}`}
+            className="btn btn-secondary"
+            data-splitbee-event="External Link"
+            data-splitbee-event-type={social.name}
+          >
+            <Image src={`/assets/${social.logo}`} width="24" height="24" />
+          </a>
+        ))}
+      </section>
+
       <section className="grid gap-2 md:grid-flow-col md:place-content-start">
         <a
           role="button"
           href="mailto:rkkautsar@gmail.com"
           className="btn btn-primary md:w-48"
+          data-splitbee-event="External Link"
+          data-splitbee-event-type="contact"
         >
           Get in touch
         </a>
-        <a role="button" href="/resume" className="btn btn-secondary md:w-48">
+        <a
+          role="button"
+          href="/resume"
+          className="btn btn-secondary md:w-48"
+          data-splitbee-event="External Link"
+          data-splitbee-event-type="resume"
+        >
           Resumé
         </a>
-        <a role="button" href="/blog" className="btn btn-secondary md:w-48">
+        <a
+          role="button"
+          href="/blog"
+          className="btn btn-secondary md:w-48"
+          data-splitbee-event="External Link"
+          data-splitbee-event-type="blog"
+        >
           Writings
         </a>
       </section>
