@@ -1,0 +1,12 @@
+{
+  "redirects": [
+    {
+      "source": "/resume",
+      "destination": "https://docs.google.com/document/d/1PgWmwl_aCWq2Z2RLJXyPSjpPKPs93vMcwt6e-CA0gBE"
+    },
+    {
+      "source": "/blog",
+      "destination": "https://blog.rakha.dev"
+    }
+  ]
+}

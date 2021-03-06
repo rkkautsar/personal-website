@@ -49,18 +49,10 @@ export default function Home(props) {
         >
           Get in touch
         </a>
-        <a
-          role="button"
-          href="https://bit.ly/rakha-resume"
-          className="btn btn-secondary md:w-48"
-        >
+        <a role="button" href="/resume" className="btn btn-secondary md:w-48">
           Resumé
         </a>
-        <a
-          role="button"
-          href="https://blog.rakha.dev"
-          className="btn btn-secondary md:w-48"
-        >
+        <a role="button" href="/blog" className="btn btn-secondary md:w-48">
           Writings
         </a>
       </section>
