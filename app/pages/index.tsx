@@ -61,21 +61,6 @@ export default function Home(props) {
         <p className="text-gray-600">{props.github.user.bio}</p>
       </header>
 
-      <section className="grid gap-2 grid-flow-col place-content-center md:place-content-start">
-        {socials.map((social) => (
-          <a
-            key={social.name}
-            role="button"
-            href={`/${social.name}`}
-            className="btn btn-secondary"
-            data-splitbee-event="External Link"
-            data-splitbee-event-type={social.name}
-          >
-            <Image src={`/assets/${social.logo}`} width="24" height="24" />
-          </a>
-        ))}
-      </section>
-
       <section className="grid gap-2 md:grid-flow-col md:place-content-start">
         <a
           role="button"
@@ -136,7 +121,7 @@ export default function Home(props) {
         </a>
       </main>
 
-      <footer className="text-center text-gray-600">
+      <footer className="flex flex-col content-center text-center text-gray-600">
         <p>Handcrafted with ❤️</p>
         <a
           target="_blank"
@@ -146,6 +131,21 @@ export default function Home(props) {
         >
           &lt; repo /&gt;
         </a>
+
+        <section className="grid gap-2 grid-flow-col place-content-center social mt-4">
+          {socials.map((social, index) => (
+            <a
+              key={social.name}
+              role="button"
+              href={`/${social.name}`}
+              className="btn btn-secondary"
+              data-splitbee-event="External Link"
+              data-splitbee-event-type={social.name}
+            >
+              {social.name}
+            </a>
+          ))}
+        </section>
       </footer>
     </div>
   );

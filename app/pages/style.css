@@ -54,6 +54,10 @@
   .btn-secondary:hover {
     @apply bg-gray-600 bg-opacity-25;
   }
+
+  .social .btn-secondary {
+    @apply p-1 px-2;
+  }
 }
 
 @layer utilities {
