@@ -132,7 +132,7 @@ export default function Home(props) {
           &lt; repo /&gt;
         </a>
 
-        <section className="grid gap-2 grid-flow-col place-content-center social mt-4">
+        <section className="grid md:grid-flow-col place-content-center social mt-4">
           {socials.map((social, index) => (
             <a
               key={social.name}
