@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Head from 'next/head';
 import { requestSummary } from 'lib/services/github';
-import Image from 'next/image';
 import './index.module.css';
 
 export async function getStaticProps() {
@@ -45,7 +44,6 @@ export default function Home(props) {
     <div className="p-10 space-y-10 max-w-screen-md mx-auto">
       <Head>
         <title>{props.github.user.name}</title>
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <header className="space-y-2">
@@ -53,6 +51,8 @@ export default function Home(props) {
           className="rounded-full w-20"
           src={props.github.user.avatarUrl}
           alt="Rakha's avatar"
+          width={80}
+          height={80}
         />
         <h1 className="leading-tight">{props.github.user.name}</h1>
         <p className="text-sm">
