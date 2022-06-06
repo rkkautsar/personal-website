@@ -3,8 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Work+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
   body {
     @apply bg-canvas text-ink;
   }
@@ -12,7 +10,7 @@
   h1,
   h2,
   h3 {
-    @apply font-heading;
+    @apply font-heading font-bold;
   }
 
   h1 {

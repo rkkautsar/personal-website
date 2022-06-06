@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Head from 'next/head';
 import { requestSummary } from 'lib/services/github';
-import './index.module.css';
 
 export async function getStaticProps() {
   try {
@@ -43,6 +42,16 @@ export default function Home(props) {
   return (
     <div className="p-10 space-y-10 max-w-screen-md mx-auto">
       <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Work+Sans:wght@400;700&display=fallback"
+          rel="stylesheet"
+        />
         <title>{props.github.user.name}</title>
       </Head>
 
