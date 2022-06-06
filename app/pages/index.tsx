@@ -49,7 +49,7 @@ export default function Home(props) {
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Work+Sans:wght@400;700&display=fallback"
+          href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;700&display=fallback"
           rel="stylesheet"
         />
         <title>{props.github.user.name}</title>

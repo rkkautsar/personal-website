@@ -1,4 +1,4 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   future: {
@@ -6,21 +6,21 @@ module.exports = {
     purgeLayersByDefault: true,
   },
   purge: [
-    "./lib/components/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{js,ts,jsx,tsx}",
+    './lib/components/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Work Sans", ...defaultTheme.fontFamily.sans],
-        heading: ["Space Mono", ...defaultTheme.fontFamily.mono],
+        sans: ['Work Sans', ...defaultTheme.fontFamily.sans],
+        heading: ['Work Sans', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        canvas: "#F0EDE9",
-        ink: "#141414",
+        canvas: '#F0EDE9',
+        ink: '#141414',
         primary: {
-          600: "#FF7144",
-          800: "#EB5728",
+          600: '#FF7144',
+          800: '#EB5728',
         },
       },
     },

@@ -36,6 +36,7 @@ function MyApp({ Component, pageProps }) {
     <>
       <Head>
         <script defer src="https://cdn.splitbee.io/sb.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta
           name="description"
           content="Rakha Kanz Kautsar is currently a software engineer at Shopee, Singapore. He's a React Native developer currently focusing on performance."
