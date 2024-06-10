@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react"
-import {spaceMono, workSans} from "@/app/fonts";
+import {workSans} from "@/app/fonts";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 export const metadata: Metadata = {
@@ -16,8 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${workSans.className}`}>{children}</body>
-      <Analytics />
+      <body className={`${workSans.className}`}>
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
+
     </html>
   );
 }
