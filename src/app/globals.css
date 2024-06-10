@@ -11,7 +11,7 @@
     h1,
     h2,
     h3 {
-        @apply font-heading;
+        @apply font-heading font-bold;
     }
 
     h1 {

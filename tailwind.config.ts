@@ -12,7 +12,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['var(--font-work-sans)', ...defaultTheme.fontFamily.sans],
-        heading: ['var(--font-space-mono)', ...defaultTheme.fontFamily.mono],
+        heading: ['var(--font-work-sans)', ...defaultTheme.fontFamily.mono],
       },
       colors: {
         canvas: "#F0EDE9",
