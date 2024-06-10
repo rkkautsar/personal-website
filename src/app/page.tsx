@@ -2,7 +2,7 @@ import * as React from 'react';
 import Head from 'next/head';
 import { requestSummary } from '@/lib/services/github';
 
-export async function getData() {
+async function getData() {
   try {
     // GraphQL
     const github = await requestSummary();
@@ -36,8 +36,9 @@ const socials = [
   },
 ];
 
-export default async function Page(props) {
+export default async function Page() {
   const data = await getData()
+  if (!data) return null;
 
   return (
     <div className="p-10 space-y-10 max-w-screen-md mx-auto">
