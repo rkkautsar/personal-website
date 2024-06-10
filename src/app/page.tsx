@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Head from 'next/head';
 import { requestSummary } from '@/lib/services/github';
+import Image from "next/image";
 
 async function getData() {
   try {
@@ -47,7 +48,7 @@ export default async function Page() {
       </Head>
 
       <header className="space-y-2">
-        <img
+        <Image
           className="rounded-full w-20"
           src={data.github.user.avatarUrl}
           alt="Rakha's avatar"
