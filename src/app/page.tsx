@@ -2,19 +2,35 @@ import * as React from 'react';
 import Head from 'next/head';
 import { requestSummary } from '@/lib/services/github';
 import Image from "next/image";
+import {Metadata} from "next";
 
+let _data = null;
 async function getData() {
+  if (_data) {
+    return _data
+  }
   try {
     // GraphQL
     const github = await requestSummary();
-    return {
+    _data = {
       github
     };
+    return _data;
   } catch (error) {
     console.error(error);
     if (process.env.NODE_ENV !== 'development') {
       process.exit(1);
     }
+  }
+}
+
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getData()
+  if (!data) return {}
+  return {
+    title: data.github.user.name,
+    description: data.github.user.bio,
   }
 }
 
