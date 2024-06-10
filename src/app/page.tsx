@@ -58,7 +58,7 @@ export default async function Page() {
         <p className="text-sm">
           {data.github.user.company}, {data.github.user.location}
         </p>
-        <p className="text-gray-600">{data.github.user.bio}</p>
+        <p className="text-ink-600">{data.github.user.bio}</p>
       </header>
 
       <section className="grid gap-2 md:grid-flow-col md:place-content-start">
@@ -105,7 +105,7 @@ export default async function Page() {
               rel="noopener"
             >
               <h3>{item.node.name} &rarr;</h3>
-              <p className="text-gray-700 truncate-3-lines">
+              <p className="text-ink-600 truncate-3-lines">
                 {item.node.description}
               </p>
             </a>
@@ -121,7 +121,7 @@ export default async function Page() {
         </a>
       </main>
 
-      <footer className="flex flex-col content-center text-center text-gray-600">
+      <footer className="flex flex-col content-center text-center text-ink-700">
         <p>Handcrafted with ❤️</p>
         <a
           target="_blank"

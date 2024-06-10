@@ -5,7 +5,7 @@
 
 @layer base {
     body {
-        @apply bg-canvas text-ink;
+        @apply bg-canvas-100 text-ink-400;
     }
 
     h1,
@@ -27,11 +27,11 @@
 
 @layer components {
     .card {
-        @apply rounded-md p-4 w-full bg-white;
+        @apply rounded-md p-4 w-full bg-canvas-300;
     }
 
     .card:hover {
-        @apply bg-gray-100;
+        @apply bg-canvas-500;
     }
 
     .btn {
@@ -39,7 +39,7 @@
     }
 
     .btn-primary {
-        @apply text-white bg-primary-600;
+        @apply text-ink-400 bg-primary-600;
     }
 
     .btn-primary:hover {
@@ -47,7 +47,7 @@
     }
 
     .btn-secondary {
-        @apply text-gray-600;
+        @apply text-ink-600;
     }
 
     .btn-secondary:hover {

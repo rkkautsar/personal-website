@@ -15,8 +15,16 @@ export default {
         heading: ['var(--font-work-sans)', ...defaultTheme.fontFamily.mono],
       },
       colors: {
-        canvas: "#F0EDE9",
-        ink: "#141414",
+        canvas: {
+          100: "#141026",
+          300:  "#211a3b",
+          500:  "#2c224f",
+        },
+        ink: {
+          400: "#ffffff",
+          600: "#efefef",
+          700: "#e0e0e0"
+        },
         primary: {
           600: "#FF7144",
           800: "#EB5728",
