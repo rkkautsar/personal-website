@@ -1,16 +1,13 @@
 import * as React from 'react';
 import Head from 'next/head';
-import { requestSummary } from 'lib/services/github';
-import './index.module.css';
+import { requestSummary } from '@/lib/services/github';
 
-export async function getStaticProps() {
+export async function getData() {
   try {
     // GraphQL
     const github = await requestSummary();
     return {
-      props: {
-        github,
-      },
+      github
     };
   } catch (error) {
     console.error(error);
@@ -39,26 +36,28 @@ const socials = [
   },
 ];
 
-export default function Home(props) {
+export default async function Page(props) {
+  const data = await getData()
+
   return (
     <div className="p-10 space-y-10 max-w-screen-md mx-auto">
       <Head>
-        <title>{props.github.user.name}</title>
+        <title>{data.github.user.name}</title>
       </Head>
 
       <header className="space-y-2">
         <img
           className="rounded-full w-20"
-          src={props.github.user.avatarUrl}
+          src={data.github.user.avatarUrl}
           alt="Rakha's avatar"
           width={80}
           height={80}
         />
-        <h1 className="leading-tight">{props.github.user.name}</h1>
+        <h1 className="leading-tight">{data.github.user.name}</h1>
         <p className="text-sm">
-          {props.github.user.company}, {props.github.user.location}
+          {data.github.user.company}, {data.github.user.location}
         </p>
-        <p className="text-gray-600">{props.github.user.bio}</p>
+        <p className="text-gray-600">{data.github.user.bio}</p>
       </header>
 
       <section className="grid gap-2 md:grid-flow-col md:place-content-start">
@@ -96,7 +95,7 @@ export default function Home(props) {
           Highlighted Projects
         </h2>
         <div className="grid place-items-center md:grid-cols-2 gap-2">
-          {props.github.user.pinnedItems.edges.map((item) => (
+          {data.github.user.pinnedItems.edges.map((item) => (
             <a
               key={item.node.url}
               href={item.node.url}
@@ -115,7 +114,7 @@ export default function Home(props) {
         <a
           role="button"
           className="btn btn-secondary mt-2"
-          href={props.github.user.url}
+          href={data.github.user.url}
         >
           More on GitHub
         </a>
