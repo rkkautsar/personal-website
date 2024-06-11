@@ -13,6 +13,7 @@ const nextConfig = {
             },
         ]
     },
+    // keeping this to not break old redirects
     async redirects() {
         return [
             {

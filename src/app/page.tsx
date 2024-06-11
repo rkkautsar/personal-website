@@ -1,19 +1,18 @@
 import * as React from 'react';
-import Head from 'next/head';
-import { requestSummary } from '@/lib/services/github';
-import Image from "next/image";
-import {Metadata} from "next";
+import { requestSummary } from '@/services/github';
+import Image from 'next/image';
+import { Metadata } from 'next';
 
-let _data = null;
+let _data: { github: any } | null = null;
 async function getData() {
   if (_data) {
-    return _data
+    return _data;
   }
   try {
     // GraphQL
     const github = await requestSummary();
     _data = {
-      github
+      github,
     };
     return _data;
   } catch (error) {
@@ -24,14 +23,13 @@ async function getData() {
   }
 }
 
-
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getData()
-  if (!data) return {}
+  const data = await getData();
+  if (!data) return {};
   return {
     title: data.github.user.name,
     description: data.github.user.bio,
-  }
+  };
 }
 
 const socials = [
@@ -54,15 +52,11 @@ const socials = [
 ];
 
 export default async function Page() {
-  const data = await getData()
+  const data = await getData();
   if (!data) return null;
 
   return (
     <div className="p-10 space-y-10 max-w-screen-md mx-auto">
-      <Head>
-        <title>{data.github.user.name}</title>
-      </Head>
-
       <header className="space-y-2">
         <Image
           className="rounded-full w-20"
@@ -90,7 +84,7 @@ export default async function Page() {
         </a>
         <a
           role="button"
-          href="/resume"
+          href="/l/resume"
           className="btn btn-secondary md:w-48"
           data-splitbee-event="External Link"
           data-splitbee-event-type="resume"
@@ -99,7 +93,7 @@ export default async function Page() {
         </a>
         <a
           role="button"
-          href="/blog"
+          href="/l/blog"
           className="btn btn-secondary md:w-48"
           data-splitbee-event="External Link"
           data-splitbee-event-type="blog"
@@ -113,7 +107,7 @@ export default async function Page() {
           Highlighted Projects
         </h2>
         <div className="grid place-items-center md:grid-cols-2 gap-2">
-          {data.github.user.pinnedItems.edges.map((item) => (
+          {data.github.user.pinnedItems.edges.map((item: any) => (
             <a
               key={item.node.url}
               href={item.node.url}
@@ -150,11 +144,11 @@ export default async function Page() {
         </a>
 
         <section className="grid md:grid-flow-col place-content-center social mt-4">
-          {socials.map((social, index) => (
+          {socials.map((social) => (
             <a
               key={social.name}
               role="button"
-              href={`/${social.name}`}
+              href={`/l/${social.name}`}
               className="btn btn-secondary"
               data-splitbee-event="External Link"
               data-splitbee-event-type={social.name}
