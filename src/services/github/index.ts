@@ -1,4 +1,4 @@
-import { GraphQLClient } from 'graphql-request';
+import { GraphQLClient, RequestDocument } from 'graphql-request';
 import * as queries from './github.gql';
 
 const endpoint = 'https://api.github.com/graphql';
@@ -8,7 +8,7 @@ const client = new GraphQLClient(endpoint, {
   },
 });
 
-export const request = (query) => client.request(query);
+export const request = (query: RequestDocument) => client.request(query);
 
 export function requestSummary() {
   return request(queries.summary);

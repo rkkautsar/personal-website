@@ -51,7 +51,7 @@ const socials = [
   },
 ];
 
-export default async function Page() {
+export default async function HomePage() {
   const data = await getData();
   if (!data) return null;
 

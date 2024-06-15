@@ -6,7 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Rakha Kanz Kautsasr',
+  title: 'Rakha Kanz Kautsar',
   description: 'Rakha Kanz Kautsar, front-end software engineer @ TikTok',
 };
 
