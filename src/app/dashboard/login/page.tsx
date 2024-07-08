@@ -1,6 +1,6 @@
 import { signIn } from '@/auth';
-import { Button } from '@radix-ui/themes';
 import { redirect } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default async function LoginPage() {
   return (

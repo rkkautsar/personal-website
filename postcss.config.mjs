@@ -2,6 +2,7 @@
 const config = {
   plugins: {
     tailwindcss: {},
+    '@csstools/postcss-relative-color-syntax': {},
   },
 };
 

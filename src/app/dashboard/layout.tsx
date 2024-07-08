@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import '@radix-ui/themes/styles.css';
-import { Theme } from '@radix-ui/themes';
 import { NavBar } from '@/app/dashboard/components/navbar';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const metadata: Metadata = {
   robots: {
@@ -16,15 +15,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Theme
-      accentColor="iris"
-      grayColor="slate"
-      appearance="dark"
-      panelBackground="solid"
-      scaling="100%"
-    >
+    <TooltipProvider>
       <NavBar />
       {children}
-    </Theme>
+    </TooltipProvider>
   );
 }

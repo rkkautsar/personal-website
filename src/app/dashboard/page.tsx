@@ -1,17 +1,20 @@
-import { Box, Tabs, Heading } from '@radix-ui/themes';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShortlinkManager } from '@/app/dashboard/ShortlinkManager';
 
 export default async function DashboardPage() {
   return (
-    <Tabs.Root defaultValue="shortlinks">
-      <Tabs.List>
-        <Tabs.Trigger value="shortlinks">Short links</Tabs.Trigger>
-      </Tabs.List>
-      <Box pt="3">
-        <Tabs.Content value="shortlinks" className="p-4">
+    <Tabs defaultValue="shortlinks">
+      <div className="flex justify-center">
+        <TabsList defaultValue="shortlinks">
+          <TabsTrigger value="shortlinks">Short links</TabsTrigger>
+          <TabsTrigger value="#">TBD</TabsTrigger>
+        </TabsList>
+      </div>
+      <div className="pt-3">
+        <TabsContent value="shortlinks" className="p-4">
           <ShortlinkManager />
-        </Tabs.Content>
-      </Box>
-    </Tabs.Root>
+        </TabsContent>
+      </div>
+    </Tabs>
   );
 }

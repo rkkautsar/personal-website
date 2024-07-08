@@ -1,19 +1,18 @@
-import { Container, Heading } from '@radix-ui/themes';
 import { SearchLinks } from '@/app/dashboard/ShortlinkManager/Search';
 import { EditLink } from '@/app/dashboard/ShortlinkManager/Edit';
 
 export function ShortlinkManager() {
   return (
-    <Container width="100%" maxWidth="640px">
+    <div className="w-full max-w-[640px] mx-auto">
       <div className="py-2">
-        <Heading className="mb-2">Add/Edit links</Heading>
+        <h2 className="mb-2">Add/Edit links</h2>
         <EditLink />
       </div>
 
       <div className="py-2">
-        <Heading>Search links</Heading>
+        <h2>Search links</h2>
         <SearchLinks />
       </div>
-    </Container>
+    </div>
   );
 }

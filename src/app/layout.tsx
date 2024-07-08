@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { workSans } from '@/app/fonts';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'Rakha Kanz Kautsar',
@@ -18,9 +19,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${workSans.className}`}>
-        {children}
-        <Analytics />
-        <SpeedInsights />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Analytics />
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
       <Script
         defer

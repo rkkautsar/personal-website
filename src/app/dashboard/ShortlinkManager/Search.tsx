@@ -1,17 +1,28 @@
 'use client';
 
-import { Button, Table, TextField } from '@radix-ui/themes';
-import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { useEffect, useMemo, useState } from 'react';
 import { findShortLink, remLink, ShortLink } from '@/services/redis/shortlink';
 import { debounce } from 'next/dist/server/utils';
-import { router } from 'next/client';
-import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export function SearchLinks() {
   const [query, setQuery] = useState('');
   const [links, setLinks] = useState<ShortLink[]>([]);
-  const router = useRouter();
 
   const debouncedSearch = useMemo(
     () =>
@@ -41,48 +52,51 @@ export function SearchLinks() {
     <div>
       <form onSubmit={handleSearch}>
         <div className="flex flex-row items-center gap-2 my-2">
-          <TextField.Root
-            placeholder="Search links..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1"
-          >
-            <TextField.Slot>
-              <MagnifyingGlassIcon height="16" width="16" />
-            </TextField.Slot>
-          </TextField.Root>
+          <div className="relative ml-auto flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search links..."
+              className="w-full rounded-lg bg-background pl-8"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
           <Button type="submit">Search</Button>
         </div>
       </form>
       {links.length > 0 ? (
-        <Table.Root layout="auto">
-          <Table.Header>
-            <Table.Row>
-              <Table.ColumnHeaderCell>Path</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell maxWidth="200px">
-                Link
-              </Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Action</Table.ColumnHeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Path</TableHead>
+              <TableHead className="max-w-[200px]">Link</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {links.map((link) => (
-              <Table.Row key={link.path}>
-                <Table.Cell>
+              <TableRow key={link.path}>
+                <TableCell>
                   <a href={`/l${link.path}`}>{link.path}</a>
-                </Table.Cell>
-                <Table.Cell maxWidth="200px">
-                  <a href={link.redirect}>{link.redirect}</a>
-                </Table.Cell>
-                <Table.Cell>
+                </TableCell>
+                <TableCell className="max-w-[200px] truncate">
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <a href={link.redirect}>{link.redirect}</a>
+                    </TooltipTrigger>
+                    <TooltipContent>{link.redirect}</TooltipContent>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>
                   <Button onClick={() => handleDelete(link.path)}>
                     Delete
                   </Button>
-                </Table.Cell>
-              </Table.Row>
+                </TableCell>
+              </TableRow>
             ))}
-          </Table.Body>
-        </Table.Root>
+          </TableBody>
+        </Table>
       ) : null}
     </div>
   );

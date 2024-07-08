@@ -1,19 +1,33 @@
 import { signOut } from '@/auth';
-import { Avatar, Button, DropdownMenu } from '@radix-ui/themes';
 import { Session } from 'next-auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ArrowDown, ChevronDown } from 'lucide-react';
 
 export function UserSessionPill({ user }: { user: Session['user'] }) {
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger>
-        <Button variant="soft" radius="full">
-          <Avatar size="1" src={user?.image!} fallback={user?.name?.[0]!} />
-          <span>{user?.name}</span>
-          <DropdownMenu.TriggerIcon />
-        </Button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar>
+          <AvatarImage src={user?.image!} />
+          <AvatarFallback>{user?.name?.[0]!}</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>
+          <div className="flex flex-col">
+            <div>{user?.name}</div>
+            <div className="text-xs">{user?.email}</div>
+          </div>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem>
           <form
             action={async () => {
               'use server';
@@ -24,8 +38,8 @@ export function UserSessionPill({ user }: { user: Session['user'] }) {
               Sign Out
             </Button>
           </form>
-        </DropdownMenu.Item>
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

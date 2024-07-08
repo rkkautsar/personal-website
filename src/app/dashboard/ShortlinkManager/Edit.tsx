@@ -1,8 +1,9 @@
 'use client';
 
-import { Button, TextField } from '@radix-ui/themes';
 import { useRef } from 'react';
 import { addLink } from '@/services/redis/shortlink';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export function EditLink() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -15,8 +16,8 @@ export function EditLink() {
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-2">
-      <TextField.Root name="path" variant="surface" placeholder="Path" />
-      <TextField.Root name="link" variant="surface" placeholder="Link" />
+      <Input name="path" placeholder="Path" />
+      <Input name="link" placeholder="Link" />
       <Button type="submit">Add</Button>
     </form>
   );

@@ -4,68 +4,152 @@
 
 
 @layer base {
+    :root {
+        --background: hsl(0 0% 100%);
+        --foreground: hsl(222.2 47.4% 11.2%);
+
+        --muted: hsl(210 40% 96.1%);
+        --muted-foreground: hsl(215.4 16.3% 46.9%);
+
+        --popover: hsl(0 0% 100%);
+        --popover-foreground: hsl(222.2 47.4% 11.2%);
+
+        --border: hsl(214.3 31.8% 91.4%);
+        --input: hsl(214.3 31.8% 91.4%);
+
+        --card: hsl(0 0% 100%);
+        --card-foreground: hsl(222.2 47.4% 11.2%);
+        --card-500: oklch(from var(--card) calc(l * 1.25) c h);
+
+        --primary: hsl(222.2 47.4% 11.2%);
+        --primary-foreground: hsl(210 40% 98%);
+        --primary-500: oklch(from var(--primary) calc(l * 1.5) c h);
+
+        --secondary: hsl(210 40% 96.1%);
+        --secondary-foreground: hsl(222.2 47.4% 11.2%);
+        --secondary-500: oklch(from var(--secondary) calc(l * 0.9) c h);
+
+        --accent: hsl(210 40% 96.1%);
+        --accent-foreground: hsl(222.2 47.4% 11.2%);
+
+        --destructive: hsl(0 100% 50%);
+        --destructive-foreground: hsl(210 40% 98%);
+
+        --ring: hsl(215 20.2% 65.1%);
+
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: hsl(251, 41%, 11%);
+        --foreground: hsl(213 31% 91%);
+
+        --muted: hsl(223 47% 11%);
+        --muted-foreground: hsl(215.4 16.3% 56.9%);
+
+        --accent: hsl(277, 20%, 18%);
+        --accent-foreground: hsl(210 40% 98%);
+
+        --popover: hsl(224 71% 4%);
+        --popover-foreground: hsl(215 20.2% 65.1%);
+
+        --border: hsl(216 34% 17%);
+        --input: hsl(216 34% 17%);
+
+        --card: hsl(224 71% 4%);
+        --card-foreground: hsl(213 31% 91%);
+
+        --primary: oklch(58.12% 0.1942 37.88);
+        --primary-foreground: hsl(0, 0%, 100%);
+        --primary-500: oklch(from var(--primary) calc(l * 1.1) c h);
+
+        --secondary: #211a3b;
+        --secondary-foreground: hsl(210 40% 98%);
+        --secondary-500: oklch(from var(--secondary) calc(l * 1.25) c h);
+
+        --destructive: hsl(0 63% 31%);
+        --destructive-foreground: hsl(210 40% 98%);
+
+        --ring: hsl(216 34% 17%);
+
+        --radius: 0.5rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
     body {
-        @apply bg-canvas-100 text-ink-400;
-    }
-
-    h1,
-    h2,
-    h3 {
-        @apply font-heading font-bold;
-    }
-
-    h1 {
-        @apply text-4xl;
-    }
-    h2 {
-        @apply text-2xl;
-    }
-    h3 {
-        @apply text-xl;
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
     }
 }
 
-@layer components {
-    .card {
-        @apply rounded-md p-4 w-full bg-canvas-300;
-    }
 
-    .card:hover {
-        @apply bg-canvas-500;
-    }
-
-    .btn {
-        @apply block w-full text-center p-4 font-bold rounded-md transition-all duration-200 ease-in-out;
-    }
-
-    .btn-primary {
-        @apply text-ink-400 bg-primary-600;
-    }
-
-    .btn-primary:hover {
-        @apply bg-primary-800;
-    }
-
-    .btn-secondary {
-        @apply text-ink-600;
-    }
-
-    .btn-secondary:hover {
-        @apply bg-gray-600 bg-opacity-25;
-    }
-
-    .social .btn-secondary {
-        @apply p-1 px-2;
-    }
+body {
+    @apply bg-background text-foreground;
 }
 
-@layer utilities {
-    .truncate-3-lines {
-        max-height: 4.2rem; /* triple the size of line-height */
-        line-height: 1.4rem;
-        display: block;
-        text-overflow: ellipsis;
-        word-wrap: break-word;
-        overflow: hidden;
-    }
+h1,
+h2,
+h3 {
+    @apply font-bold;
 }
+
+h1 {
+    @apply text-4xl;
+}
+
+h2 {
+    @apply text-2xl;
+}
+
+h3 {
+    @apply text-xl;
+}
+
+.card {
+    @apply rounded-md p-4 w-full bg-secondary;
+}
+
+.card:hover {
+    @apply bg-secondary-500;
+}
+
+.btn {
+    @apply block w-full text-center p-4 font-bold rounded-md transition-all duration-200 ease-in-out;
+}
+
+.btn-primary {
+    @apply text-primary-foreground bg-primary;
+}
+
+.btn-primary:hover {
+    @apply bg-primary-500;
+}
+
+.btn-secondary {
+    @apply text-foreground;
+}
+
+.btn-secondary:hover {
+    @apply bg-gray-600 bg-opacity-25;
+}
+
+.social .btn-secondary {
+    @apply p-1 px-2;
+}
+
+
+.truncate-3-lines {
+    max-height: 4.2rem; /* triple the size of line-height */
+    line-height: 1.4rem;
+    display: block;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+

@@ -2,8 +2,11 @@ import * as React from 'react';
 import { requestSummary } from '@/services/github';
 import Image from 'next/image';
 import { Metadata } from 'next';
+import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/components/ui/dark-mode-toggle';
 
 let _data: { github: any } | null = null;
+
 async function getData() {
   if (_data) {
     return _data;
@@ -58,13 +61,17 @@ export default async function HomePage() {
   return (
     <div className="p-10 space-y-10 max-w-screen-md mx-auto">
       <header className="space-y-2">
-        <Image
-          className="rounded-full w-20"
-          src={data.github.user.avatarUrl}
-          alt="Rakha's avatar"
-          width={80}
-          height={80}
-        />
+        <div className="relative">
+          <ModeToggle className="absolute top-0 right-0" />
+          <Image
+            src="https://github.com/rkkautsar.png"
+            alt="@rkkautsar"
+            className="rounded-full"
+            width={80}
+            height={80}
+            priority
+          />
+        </div>
         <h1 className="leading-tight">{data.github.user.name}</h1>
         <p className="text-sm">
           {data.github.user.company}, {data.github.user.location}
@@ -73,33 +80,21 @@ export default async function HomePage() {
       </header>
 
       <section className="grid gap-2 md:grid-flow-col md:place-content-start">
-        <a
-          role="button"
-          href="mailto:rkkautsar@gmail.com"
-          className="btn btn-primary md:w-48"
-          data-splitbee-event="External Link"
-          data-splitbee-event-type="contact"
-        >
-          Get in touch
-        </a>
-        <a
-          role="button"
-          href="/l/resume"
-          className="btn btn-secondary md:w-48"
-          data-splitbee-event="External Link"
-          data-splitbee-event-type="resume"
-        >
-          Resumé
-        </a>
-        <a
-          role="button"
-          href="/l/blog"
-          className="btn btn-secondary md:w-48"
-          data-splitbee-event="External Link"
-          data-splitbee-event-type="blog"
-        >
-          Writings
-        </a>
+        <Button asChild size="block">
+          <a href="mailto:rkkautsar@gmail.com" className="md:w-48">
+            Get in touch
+          </a>
+        </Button>
+        <Button asChild variant="ghost" size="block" className="md:w-48">
+          <a role="button" href="/l/resume">
+            Resumé
+          </a>
+        </Button>
+        <Button asChild variant="ghost" size="block" className="md:w-48">
+          <a role="button" href="/l/blog">
+            Writings
+          </a>
+        </Button>
       </section>
 
       <main>
@@ -132,17 +127,7 @@ export default async function HomePage() {
         </a>
       </main>
 
-      <footer className="flex flex-col content-center text-center text-ink-700">
-        <p>Handcrafted with ❤️</p>
-        <a
-          target="_blank"
-          rel="noopener"
-          className="text-blue-600 font-mono"
-          href="https://github.com/rkkautsar/personal-website"
-        >
-          &lt; repo /&gt;
-        </a>
-
+      <footer className="flex flex-col content-center text-center text-ink-700 gap-2">
         <section className="grid md:grid-flow-col place-content-center social mt-4">
           {socials.map((social) => (
             <a
@@ -157,6 +142,18 @@ export default async function HomePage() {
             </a>
           ))}
         </section>
+
+        <div>
+          <a
+            target="_blank"
+            role="button"
+            rel="noopener"
+            className="font-mono hover:underline p-2"
+            href="https://github.com/rkkautsar/personal-website"
+          >
+            &lt; view-source /&gt;
+          </a>
+        </div>
       </footer>
     </div>
   );

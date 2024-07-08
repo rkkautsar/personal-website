@@ -1,5 +1,5 @@
 import { auth, signOut } from '@/auth';
-import { Button } from '@radix-ui/themes';
+import { Button } from '@/components/ui/button';
 
 export default async function UnauthorizedPage() {
   const session = await auth();
