@@ -5,6 +5,7 @@ import { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from '@/components/ui/dark-mode-toggle';
 
+export const revalidate = 86400;
 let _data: { github: any } | null = null;
 
 async function getData() {
