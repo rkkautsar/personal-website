@@ -1,10 +1,9 @@
 import type { Config } from 'tailwindcss';
-
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 export default {
   darkMode: ['class'],
-  content: ['src/app/**/*.{ts,tsx}', 'src/components/**/*.{ts,tsx}'],
+  content: ['src/**/*.{ts,tsx}', 'index.html'],
   theme: {
     container: {
       center: true,
@@ -53,12 +52,12 @@ export default {
         },
       },
       borderRadius: {
-        lg: `var(--radius)`,
-        md: `calc(var(--radius) - 2px)`,
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['var(--font-work-sans)', ...fontFamily.sans],
+        sans: ['"Work Sans"', ...fontFamily.sans],
       },
       keyframes: {
         'accordion-down': {

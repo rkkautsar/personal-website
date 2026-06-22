@@ -1,0 +1,8 @@
+name = "personal-website-worker"
+main = "src/index.ts"
+compatibility_date = "2024-05-01"
+
+[[kv_namespaces]]
+binding = "LINKS"
+id = "031e8c5703fc4caba0cd745465565d14"
+preview_id = "24bd8208a9cb419a9c136af1270e82f3"

@@ -1,3 +1,0 @@
-schema:
-  - "services/github/schema.gql"
-documents: "src/**/*.{graphql,js,ts,jsx,tsx"

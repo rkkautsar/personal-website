@@ -1,0 +1,46 @@
+{
+  "user": {
+    "url": "https://github.com/rkkautsar",
+    "name": "Rakha Kanz Kautsar",
+    "bio": "Software Engineer @ Hopper",
+    "company": "Hopper",
+    "location": "Singapore",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/1536976?u=b9417edffe77183a9b7d871253da09ee4fe23644&v=4",
+    "pinnedItems": {
+      "edges": [
+        {
+          "node": {
+            "name": "reprobench",
+            "url": "https://github.com/rkkautsar/reprobench",
+            "description": "📊 Reproducible Benchmark for Everyone",
+            "updatedAt": "2025-04-25T15:11:01Z"
+          }
+        },
+        {
+          "node": {
+            "name": "redux-companion",
+            "url": "https://github.com/rkkautsar/redux-companion",
+            "description": " Opinionated way to reduce boilerplate on async (or sync) redux logic, like fetching data etc. Zero dependency.",
+            "updatedAt": "2020-02-10T22:21:42Z"
+          }
+        },
+        {
+          "node": {
+            "name": "psmon",
+            "url": "https://github.com/rkkautsar/psmon",
+            "description": "👁 Monitors and limits process resource",
+            "updatedAt": "2019-11-26T22:16:17Z"
+          }
+        },
+        {
+          "node": {
+            "name": "sudoku-solver",
+            "url": "https://github.com/rkkautsar/sudoku-solver",
+            "description": "SAT-based Sudoku Solver",
+            "updatedAt": "2024-02-18T14:14:31Z"
+          }
+        }
+      ]
+    }
+  }
+}
