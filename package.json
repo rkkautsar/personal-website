@@ -8,10 +8,12 @@
     "prebuild": "npx tsx scripts/fetch-github.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "worker:dev": "wrangler dev worker/src/index.ts --port 8788",
-    "deploy:worker": "wrangler deploy worker/src/index.ts --name personal-website-worker",
+    "worker:dev": "wrangler dev --config worker/wrangler.toml --port 8788",
+    "deploy:worker": "wrangler deploy --config worker/wrangler.toml",
     "deploy:pages": "wrangler pages deploy dist --project-name personal-website",
-    "lint": "tsc -b --noEmit"
+    "lint": "tsc --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "test:auth": "tsx --test worker/src/*.test.ts",
+    "check:worker": "tsc -p worker/tsconfig.json"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.0",
@@ -22,6 +24,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "jose": "^6.2.12",
     "lucide-react": "^0.395.0",
     "react": "^18",
     "react-dom": "^18",

@@ -1,8 +1,17 @@
 name = "personal-website-worker"
 main = "src/index.ts"
 compatibility_date = "2024-05-01"
+routes = [{ pattern = "rakha.dev/api/admin/*", zone_name = "rakha.dev" }]
+workers_dev = true
+account_id = "3d2c7278332e1314ee55afa8743dd6bc"
 
 [[kv_namespaces]]
 binding = "LINKS"
 id = "031e8c5703fc4caba0cd745465565d14"
 preview_id = "24bd8208a9cb419a9c136af1270e82f3"
+
+[vars]
+ACCESS_TEAM_DOMAIN = "https://rkkautsar.cloudflareaccess.com"
+ACCESS_AUD = "d4651dd180626c2294a8d2b6765eca49bb13e0a69a084298b291f0483a322641"
+ADMIN_EMAILS = "rkkautsar@gmail.com"
+ADMIN_ORIGIN = "https://rakha.dev"

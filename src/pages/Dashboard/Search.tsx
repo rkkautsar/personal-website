@@ -1,3 +1,4 @@
+import { adminFetch } from './api';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,9 +17,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-const WORKER_URL = import.meta.env.VITE_WORKER_URL || '';
-const API_SECRET = 'bbd4966f7647870920ac3e54662cad1805fb095190b0e447a808825b8995f472';
-
 interface ShortLink {
   path: string;
   redirect: string;
@@ -26,36 +24,47 @@ interface ShortLink {
 
 async function fetchLinks(query: string): Promise<ShortLink[]> {
   const params = new URLSearchParams({ query });
-  const res = await fetch(`${WORKER_URL}/api/links?${params}`);
-  if (!res.ok) return [];
+  const res = await adminFetch(`/api/admin/links?${params}`);
+
   return res.json();
 }
 
 async function deleteLink(path: string) {
-  await fetch(`${WORKER_URL}/api/links/${encodeURIComponent(path)}`, {
+  await adminFetch(`/api/admin/links/${encodeURIComponent(path)}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${API_SECRET}` },
   });
 }
 
 export function SearchLinks() {
+  const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [links, setLinks] = useState<ShortLink[]>([]);
 
   const handleSearch = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
-    const result = await fetchLinks(query);
-    setLinks(result);
+    setError('');
+    try {
+      const result = await fetchLinks(query);
+      setLinks(result);
+    } catch (error) {
+      setError((error as Error).message);
+    }
   };
 
   const handleDelete = async (path: string) => {
-    await deleteLink(path);
-    const result = await fetchLinks(query);
-    setLinks(result);
+    setError('');
+    try {
+      await deleteLink(path);
+      const result = await fetchLinks(query);
+      setLinks(result);
+    } catch (error) {
+      setError((error as Error).message);
+    }
   };
 
   return (
     <div>
+      {error && <p role="alert">{error}</p>}
       <form onSubmit={handleSearch}>
         <div className="flex flex-row items-center gap-2 my-2">
           <div className="relative ml-auto flex-1">
