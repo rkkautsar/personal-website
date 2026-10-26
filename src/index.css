@@ -239,8 +239,7 @@ button:focus-visible {
 }
 
 .section-label,
-.eyebrow,
-.project-kicker {
+.eyebrow {
   margin: 0;
   color: var(--pine-blue);
   font-size: 0.68rem;
