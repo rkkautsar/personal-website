@@ -29,6 +29,10 @@ yarn-error.log*
 
 # cloudflare
 .wrangler
+/public/data/*.json
+/public/_redirects
+/src/data/posts.json
+/src/data/github-profile.json
 
 # typescript
 *.tsbuildinfo
