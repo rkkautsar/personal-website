@@ -20,3 +20,7 @@ npm run dev
 ## Weekly refresh
 
 The Cloudflare cron Worker compares the current GitHub profile and all pinned repositories with the most recently deployed GraphQL snapshot. It requests a Pages deployment only when those pinned items or profile fields change. Set `CF_API_TOKEN` and `GITHUB_ACCESS_TOKEN` as Worker secrets; see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## Cart performance demo
+
+Standalone static demos and the prefetch timeline are published from `public/demos/cart-performance/`. Once deployed, the rendering demo is available at `/demos/cart-performance/rendering-demo.html` and the cache demo at `/demos/cart-performance/cache-demo.html`. The pages load the adjacent `index.html`; keep the files together. These assets do not use Pages Functions.
