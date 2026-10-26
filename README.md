@@ -23,4 +23,4 @@ The Cloudflare cron Worker compares the current GitHub profile and all pinned re
 
 ## Cart performance demo
 
-Standalone static demos and the prefetch timeline are published from `public/demos/cart-performance/`. Once deployed, the rendering demo is available at `/demos/cart-performance/rendering-demo.html` and the cache demo at `/demos/cart-performance/cache-demo.html`. The pages load the adjacent `index.html`; keep the files together. These assets do not use Pages Functions.
+Standalone static demos and the prefetch timeline are published from `public/demos/cart-performance/`. For Hashnode Widgets, embed `index.html#render-embed` or `index.html#cache-embed` directly so there is only one iframe and one scroll area. Set the widget iframe height explicitly; `100%` does not auto-size to the framed content. The legacy `rendering-demo.html` and `cache-demo.html` URLs redirect to those direct panel URLs. These assets do not use Pages Functions.
