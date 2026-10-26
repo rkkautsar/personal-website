@@ -328,6 +328,10 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
+.experience-period span {
+  white-space: nowrap;
+}
+
 .experience-item h3 {
   margin: 0;
   color: var(--bright-snow);
