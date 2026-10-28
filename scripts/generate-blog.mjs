@@ -1,5 +1,5 @@
 import { createServer } from 'vite';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import React from 'react';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 
@@ -11,6 +11,13 @@ const css = (main.css || []).map(file => `<link rel="stylesheet" href="/${file}"
 const client = manifest['src/blog/client.ts'].file;
 const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false }, optimizeDeps: { noDiscovery: true }, appType: 'custom' });
 try {
+  const { default: Home } = await server.ssrLoadModule('/src/pages/Home.tsx');
+  const homeHtml = renderToString(React.createElement(Home));
+  const indexPath = 'dist/index.html';
+  const indexHtml = await readFile(indexPath, 'utf8');
+  const rootPlaceholder = '<div id="root"></div>';
+  if (!indexHtml.includes(rootPlaceholder)) throw new Error('Homepage root placeholder not found.');
+  await writeFile(indexPath, indexHtml.replace(rootPlaceholder, () => `<div id="root">${homeHtml}</div>`));
   const { posts } = await server.ssrLoadModule('/src/blog/metadata.ts');
   const { Article } = await server.ssrLoadModule('/src/blog/Article.tsx');
   for (const post of posts) {
