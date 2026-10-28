@@ -1,0 +1,42 @@
+.engagement { margin: 5rem 0 3rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.engagement-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.engagement h2 { margin: 0; font-size: 1.5rem; letter-spacing: -.02em; }
+.engagement-notice { margin: .75rem 0 2rem; color: #aaa99e; font-size: .85rem; }
+.engagement-actions { display: flex; align-items: center; gap: .75rem; }
+.engagement-like { display: inline-flex; align-items: center; gap: .55rem; padding: .25rem; border: 0; background: transparent; color: var(--bone); font: inherit; cursor: pointer; }
+.engagement-heart { display: inline-block; color: #b8aaa4; font-size: 1.8rem; line-height: 1; transform: scale(var(--heart-scale, 1)); transform-origin: center; transition: color .2s; }
+.engagement-like.has-likes .engagement-heart { color: #d88391; }
+.engagement-heart.is-bouncing { animation: heart-bounce .42s linear; }
+@keyframes heart-bounce { 0% { transform: scale(var(--heart-scale)); } 35% { transform: scale(var(--heart-pop)); } 65% { transform: scale(var(--heart-dip)); } 85% { transform: scale(var(--heart-settle)); } 100% { transform: scale(var(--heart-scale)); } }
+.engagement-like-count { font-size: .95rem; font-variant-numeric: tabular-nums; }
+.engagement-like:disabled { cursor: default; }
+.engagement-reset { width: 1.5rem; padding: .25rem; border: 0; background: transparent; color: #aaa99e; font: inherit; font-size: 1.15rem; line-height: 1; cursor: pointer; }
+.engagement-reset:hover { color: var(--bright-snow); }
+.engagement-reset[hidden] { visibility: hidden; display: block; }
+.engagement-submit { font: inherit; cursor: pointer; border: 1px solid var(--line); border-radius: 999px; padding: .55rem 1rem; background: transparent; color: var(--bone); font-size: .9rem; }
+@media (prefers-reduced-motion: reduce) { .engagement-heart.is-bouncing { animation: none; } }
+.engagement-comments { display: grid; gap: 1.5rem; margin-top: 2rem; }
+.engagement-empty { margin: 0; color: #aaa99e; font-size: .95rem; }
+.engagement-comment { padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+.engagement-comment-meta { display: flex; align-items: baseline; gap: .75rem; font-size: .9rem; }
+.engagement-comment-meta time { color: #aaa99e; font-size: .8rem; }
+.engagement-delete { padding: 0; border: 0; background: transparent; color: #aaa99e; font: inherit; font-size: .8rem; cursor: pointer; }
+.engagement-separator { color: #77796e; }
+.engagement-delete:hover { color: var(--bright-snow); text-decoration: underline; text-underline-offset: .2em; }
+.engagement-comment p { color: var(--bone); line-height: 1.65; margin: .5rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.engagement-form { display: grid; gap: 1rem; margin-top: 2rem; }
+.engagement-form[hidden] { display: none; }
+.engagement-form h3 { margin: 0; font-size: 1.05rem; }
+.engagement-form label { display: grid; gap: .4rem; color: var(--bone); font-size: .85rem; }
+.engagement-form input, .engagement-form textarea { width: 100%; border: 1px solid var(--line); border-radius: .5rem; padding: .75rem; background: #ffffff08; color: var(--bright-snow); font: inherit; }
+.engagement-form textarea { resize: vertical; min-height: 6rem; }
+.engagement-turnstile:empty { display: none; }
+.engagement-form input:focus-visible, .engagement-form textarea:focus-visible, .engagement button:focus-visible { outline: 2px solid var(--pine-blue); outline-offset: 2px; }
+.engagement-submit { justify-self: start; background: var(--bone); color: var(--carbon-black); font-weight: 600; }
+.engagement-submit:disabled { opacity: .5; cursor: not-allowed; }
+.engagement-status { margin: 1rem 0 0; color: #aaa99e; font-size: .85rem; line-height: 1.5; }
+.engagement-status:empty { display: none; }
+.engagement-status.is-error { margin: 1.5rem 0; color: #d5949d; }
+.engagement-retry { margin-top: .5rem; padding: 0; border: 0; background: none; color: var(--bone); text-decoration: underline; cursor: pointer; font: inherit; font-size: .85rem; }
+.engagement-retry[hidden] { display: none; }
+.engagement-pending { color: #aaa99e; font-size: .8rem; }

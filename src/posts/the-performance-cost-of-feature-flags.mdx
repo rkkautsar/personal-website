@@ -1,0 +1,43 @@
+I’ve seen feature flag flicker at Shopee, TikTok, and Hopper. The app paints before it has the value it should use. After a rollout, that can mean an old default. During a live experiment, it can mean the treatment arrives after the first frame. Either way, users see one version, then another.
+
+Removing a stale default can fix one flag, but it won’t prevent flicker in the next experiment. I’d rather fix what the app does while flags are loading.
+
+Try the demo first. It shows four first-render strategies in one purchase flow: server bootstrap, cache + SWR, a fallback, and waiting for flags. Assignment B adds express delivery and moves the purchase row. In Cache + SWR, replay after the first run to see the fresh assignment load immediately. The delay is simulated; the demo doesn’t measure CLS.
+
+<Demo name="demo-flag-flicker" />
+
+## 1\. Send flags with server-rendered HTML
+
+If the server renders the page for each request, it can evaluate flags and put their values in the HTML. The browser has the assignment before the page paints. This works when the server has the identity and attributes the flag rules need, and can evaluate them without holding up the response.
+
+Many apps don’t render a personalized page on the server. They serve the same static shell from a CDN, then build the page in the browser. That shell can’t contain a user-specific assignment. Adding server work just to inject flags may cost more than it saves. If you do bootstrap values, the server and client need to use the same ones or the UI can still switch during hydration. [LaunchDarkly’s JavaScript guidance](https://launchdarkly.com/docs/eu-docs/sdk/client-side/javascript/default-values) covers bootstrapping and waiting for initialization.
+
+## 2\. Reuse local values in a static shell
+
+**This is my go-to most of the time, when it's a static app.**
+
+When the HTML can’t include the user’s assignment, I keep the last flag values in the browser’s local cache, under that user’s identity. On startup, the app reads that user’s saved values before rendering. It then asks the flag service for current values in the background. When the response comes back, the app updates the cache and uses the fresh values. That second request and update is what “revalidate” means here.
+
+This is stale-while-revalidate (SWR): show the saved value now, check whether it’s current, then replace it in the cache and app if needed. A shared flag client can read and refresh values once for screens owned by different teams. It also helps during an experiment: returning visitors see their last assignment while the service checks for updates.
+
+Keep a separate cache for each user and environment. If someone signs out or switches accounts, don’t reuse the previous user’s values. Do the same when a flag input changes, like region or entitlement. Otherwise the app can briefly show the wrong variant. A cache miss still needs a fallback.
+
+For an experiment, decide whether a fresh response can move someone to another variant mid-session, and log exposure for the version they actually saw. For a kill switch, a cached “on” value can keep the feature on until revalidation finishes—or longer if the request fails. That may be too long for something meant to turn off risky behavior immediately.
+
+## 3\. Use a fallback, but expect it to be wrong sometimes
+
+Without server values or a local cache, the app still needs something to render while the flag client starts. That’s often a hard-coded default. If it doesn’t match the user’s assignment, the app shows the fallback and then replaces it. This can happen with a brand-new experiment just as easily as with a forgotten flag. Changing one default only fixes that one case; a shared loading strategy covers more screens.
+
+## 4\. Wait when a wrong value is worse than a delay
+
+You can hold the flag-controlled part of the page until the client is ready. That avoids showing the wrong variant, but leaves a placeholder while the service responds. I wouldn’t hold the whole page for one flag-controlled button.
+
+## Flicker can affect CLS
+
+If the replacement moves things on screen, flicker can add to Cumulative Layout Shift (CLS). A banner inserted above the page can push everything down. A button changing color in the same space can look wrong, but it doesn’t create a layout shift by itself. CLS measures movement of visible elements; it can’t tell whether the first version was the right one. [web.dev’s CLS guide](https://web.dev/articles/cls) explains what counts.
+
+## Clean up when the rollout is finished
+
+You don’t have to find every stale flag by hand. [PostHog documents cleanup workflows](https://posthog.com/docs/feature-flags/cleaning-up-stale-flags), and [Reflag offers automated cleanup](https://reflag.com/). The tool can help find old branches; the team still decides when it’s safe to remove them.
+
+Give temporary flags an owner and cleanup date. Once the decision is final, make the winning behavior unconditional and remove the losing branch. Retire the remote flag when supported clients no longer need it; old mobile versions may stick around. Cleanup finishes the rollout, but it needn’t block a shared fix for first-render flicker.

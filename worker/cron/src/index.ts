@@ -26,8 +26,6 @@ interface ProfileSnapshot {
 const accountId = '3d2c7278332e1314ee55afa8743dd6bc';
 const projectName = 'personal-website';
 const publishedSnapshotUrl = 'https://rakha.dev/data/github.json';
-const publishedHashnodeUrl = 'https://rakha.dev/data/hashnode.json';
-const hashnodeFeedUrl = 'https://blog.rakha.dev/rss.xml';
 
 const query = `
   query summary {
@@ -120,81 +118,15 @@ async function getPublishedProfile(): Promise<ProfileSnapshot | null> {
   return data.user?.pinnedItems ? data : null;
 }
 
-function decodeXml(value: string) {
-  return value
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
-    .replace(/&#x([\da-f]+);/gi, (_, code: string) => String.fromCodePoint(parseInt(code, 16)))
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&');
-}
-
-function readXmlTag(xml: string, tag: string) {
-  const match = xml.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`, 'i'));
-  return match?.[1] ? decodeXml(match[1].trim()) : '';
-}
-
-function toPlainText(value: string) {
-  return decodeXml(value.replace(/<[^>]*>/g, ' ')).replace(/\s+/g, ' ').trim();
-}
-
-async function getCurrentHashnodePosts() {
-  const response = await fetch(hashnodeFeedUrl, {
-    cache: 'no-store',
-    headers: {
-      accept: 'application/rss+xml, application/xml, text/xml',
-      'Cache-Control': 'no-cache',
-    },
-  });
-  if (!response.ok) throw new Error(`Hashnode RSS feed returned ${response.status}.`);
-
-  const xml = await response.text();
-  if (!/<rss\b/i.test(xml)) throw new Error('Hashnode did not return an RSS feed.');
-
-  return [...xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)]
-    .flatMap(([_, item]) => {
-      const title = toPlainText(readXmlTag(item, 'title'));
-      const url = readXmlTag(item, 'link') || readXmlTag(item, 'guid');
-      const timestamp = Date.parse(readXmlTag(item, 'pubDate'));
-      if (!title || !url || !Number.isFinite(timestamp)) return [];
-      return [{
-        title,
-        url: new URL(url, hashnodeFeedUrl).href,
-        date: new Date(timestamp).toISOString().slice(0, 10),
-        description: toPlainText(readXmlTag(item, 'description')),
-      }];
-    })
-    .sort((left, right) => right.date.localeCompare(left.date));
-}
-
-async function getPublishedHashnodePosts() {
-  const response = await fetch(`${publishedHashnodeUrl}?refresh=${Date.now()}`, {
-    cache: 'no-store',
-    headers: { 'Cache-Control': 'no-cache' },
-  });
-  if (!response.ok) return null;
-  const data = (await response.json()) as { posts?: Array<{ title: string; url?: string; date: string; description: string }> };
-  return Array.isArray(data.posts) ? data.posts : null;
-}
-
 export default {
   async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
     const current = await getCurrentProfile(env.GITHUB_ACCESS_TOKEN);
     const published = await getPublishedProfile();
-    const currentPosts = await getCurrentHashnodePosts();
-    const publishedPosts = await getPublishedHashnodePosts();
     const githubChanged =
       !published ||
       JSON.stringify(comparableProfile(current)) !== JSON.stringify(comparableProfile(published));
-    const writingChanged =
-      !publishedPosts ||
-      JSON.stringify(currentPosts) !== JSON.stringify(publishedPosts.map(({ title, url, date, description }) => ({ title, url, date, description })));
-
-    if (!githubChanged && !writingChanged) {
-      console.log('Pinned GitHub profile and Hashnode posts are unchanged; skipping the Pages deployment.');
+    if (!githubChanged) {
+      console.log('Pinned GitHub profile is unchanged; skipping the Pages deployment.');
       return;
     }
 
@@ -214,6 +146,6 @@ export default {
       throw new Error(`Failed to trigger Pages deployment: ${await response.text()}`);
     }
 
-    console.log(`Pages deployment triggered. GitHub changed: ${githubChanged}; Hashnode writing changed: ${writingChanged}.`);
+    console.log(`Pages deployment triggered. GitHub changed: ${githubChanged}.`);
   },
 };

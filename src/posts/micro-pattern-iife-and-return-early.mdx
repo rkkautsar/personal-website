@@ -1,0 +1,240 @@
+I have a soft spot for Immediately Invoked Function Expressions (IIFEs). Not for the classic use case of creating a private scope, but for something simpler: calculating a value with more than a trivial expression.
+
+I rarely see other developers use them this way. Most would reach for nested ternaries, `if/else` statements, or extract the logic into a separate function.
+
+Out of curiosity, I scanned four popular JavaScript/TypeScript repositories:
+
+| Repository | IIFEs | Ternaries | `if` statements |
+| --- | --: | --: | --: |
+| [React](https://github.com/facebook/react/tree/a6b912fbe77f) | 4 | 3,704 | 17,012 |
+| [Next.js](https://github.com/vercel/next.js/tree/c8e811eee088) | 1,025 | 43,006 | 108,906 |
+| [Vite](https://github.com/vitejs/vite/tree/e954a9cda0b5) | 20 | 663 | 3,133 |
+| [Docusaurus](https://github.com/facebook/docusaurus/tree/4e6fe61666a5) | 12 | 562 | 1,392 |
+| **Total** | **1,061** | **47,935** | **130,443** |
+
+That's roughly **45 ternaries for every IIFE**. The counts include all IIFE use cases, not just the pattern I'm advocating. Also, 309 of 6,301 scanned files had parsing errors, mostly from React, so don't take this as an exhaustive survey.
+
+Of course, these constructs aren't interchangeable, and their relative frequency doesn't tell us which is better. But I think the numbers illustrate how uncommon IIFEs are compared to more familiar control-flow constructs.
+
+I think they deserve more love.
+
+## IIFE as an expression
+
+Suppose we're calculating an access level based on several conditions.
+
+A nested ternary is one option:
+
+```js
+const accessLevel = !user
+  ? 'guest'
+  : !user.isActive
+    ? 'inactive'
+    : user.isAdmin
+      ? 'admin'
+      : user.isStaff
+        ? 'staff'
+        : 'user';
+```
+
+This works, but I find nested ternaries increasingly difficult to follow. Each additional condition means more branches to mentally match.
+
+We could use `if/else` instead:
+
+```js
+let accessLevel;
+
+if (!user) {
+  accessLevel = 'guest';
+} else if (!user.isActive) {
+  accessLevel = 'inactive';
+} else if (user.isAdmin) {
+  accessLevel = 'admin';
+} else if (user.isStaff) {
+  accessLevel = 'staff';
+} else {
+  accessLevel = 'user';
+}
+```
+
+Arguably more readable, but now we have a mutable variable. When reviewing the code, we need to check that every branch assigns it correctly, and whether it gets reassigned elsewhere.
+
+Here's how I'd write it using an IIFE:
+
+```js
+const accessLevel = (() => {
+  if (!user) return 'guest';
+  if (!user.isActive) return 'inactive';
+  if (user.isAdmin) return 'admin';
+  if (user.isStaff) return 'staff';
+
+  return 'user';
+})();
+```
+
+We get the familiar control flow of a regular function, but the whole calculation becomes an expression that produces a single `const`.
+
+I can review the calculation independently, then move on knowing that `accessLevel` won't be reassigned.
+
+The calculation isn't necessarily simpler, but there's less to keep track of.
+
+## Early returns make it better
+
+Another thing I like about the last example is the use of early returns.
+
+Compare it with nested conditions:
+
+```js
+function getAccessLevel(user) {
+  if (user) {
+    if (user.isActive) {
+      if (user.isAdmin) {
+        return 'admin';
+      } else if (user.isStaff) {
+        return 'staff';
+      }
+      return 'user';
+    }
+    return 'inactive';
+  }
+  return 'guest';
+}
+```
+
+With nested conditions, we need to keep track of which branches we're inside.
+
+With early returns:
+
+```js
+function getAccessLevel(user) {
+  if (!user) return 'guest';
+  if (!user.isActive) return 'inactive';
+  if (user.isAdmin) return 'admin';
+  if (user.isStaff) return 'staff';
+
+  return 'user';
+}
+```
+
+Once we've passed the first condition, we know `user` exists. After the second, we know they're active. We can forget about those conditions for the remainder of the function.
+
+This reduces the number of assumptions we need to keep in our head at once.
+
+Combining this with an IIFE gives us both benefits: flat control flow and a self-contained calculation.
+
+## Why not just extract a function?
+
+You certainly could:
+
+```js
+function getAccessLevel(user) {
+  if (!user) return 'guest';
+  if (!user.isActive) return 'inactive';
+  if (user.isAdmin) return 'admin';
+  if (user.isStaff) return 'staff';
+
+  return 'user';
+}
+
+const accessLevel = getAccessLevel(user);
+```
+
+There's nothing wrong with this, and it's probably preferable if the calculation is reused or represents a meaningful domain concept.
+
+But if it's only used once, extracting it also means the reader has to jump somewhere else to understand how the value is calculated.
+
+Sometimes that abstraction helps. Sometimes it just moves a few lines of code elsewhere.
+
+I prefer an IIFE when the calculation is small enough to understand locally, but complicated enough to benefit from ordinary control flow.
+
+For a simple condition, I'd still use a ternary. And if an IIFE grows to fifty lines, I'd probably extract it too.
+
+I'm not suggesting we replace every conditional with an IIFE. It's just another option worth considering.
+
+## Closing thoughts
+
+What I like about IIFEs and early returns is that they make code easier to reason about without necessarily changing the logic.
+
+Early returns let us discard conditions we've already handled. IIFEs give a calculation its own boundary, so we can review it once and treat the result as a value afterwards.
+
+Neither makes the actual computation less complex. They just reduce how much of it we need to think about at once.
+
+And when reading or reviewing unfamiliar code, I think that makes quite a difference.
+
+* * *
+
+## Appendix: Other uses for IIFEs
+
+### A. Private state with closures
+
+An IIFE can return a function that retains access to variables in its original scope.
+
+Here's a simplified version of something I used in an older project:
+
+```js
+const nextId = (() => {
+  let id = 0;
+  return () => ++id;
+})();
+
+nextId(); // 1
+nextId(); // 2
+nextId(); // 3
+```
+
+The `id` variable persists between calls, but isn't directly accessible from outside.
+
+No class or exposed module-level variable needed. Just a closure.
+
+### B. Async code inside synchronous callbacks
+
+Sometimes we want to use `await` somewhere that doesn't accept an async callback directly, such as a React effect.
+
+```js
+useEffect(() => {
+  const controller = new AbortController();
+
+  (async () => {
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      setData(data);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setError(error);
+      }
+    }
+  })();
+
+  return () => controller.abort();
+}, [url]);
+```
+
+The effect callback itself remains synchronous, while the IIFE lets us use `async/await` within it.
+
+We still need to handle errors, cancellation, and stale responses properly. The IIFE only solves the async syntax problem.
+
+### C. One-time initialization
+
+We can also use an IIFE to initialize a value that requires several steps.
+
+```js
+const formatter = (() => {
+  const locale = navigator.language || 'en-US';
+
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'USD',
+  });
+})();
+```
+
+This runs once when the containing module is evaluated, rather than repeating the setup whenever the formatter is used.
+
+It's a small example, but another case where having a function execute immediately and return a value can be convenient.

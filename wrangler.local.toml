@@ -1,0 +1,9 @@
+# Local preview only. Do not use this configuration for deployment.
+name = "personal-website-local"
+pages_build_output_dir = "./dist"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "personal-website-local"
+database_id = "00000000-0000-0000-0000-000000000001"

@@ -11,7 +11,7 @@ export function WritingSection() {
       {posts.length ? (
         <div className="writing-list">
           {posts.map((post) => (
-            <a className="writing-item" href={post.url} key={post.url} target="_blank" rel="noreferrer">
+            <a className="writing-item" href={post.url} key={post.url}>
               <span>
                 <span className="writing-title">{post.title}</span>
                 <span className="writing-description">{post.description}</span>

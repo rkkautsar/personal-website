@@ -1,0 +1,8 @@
+# D1 migration configuration. Pages bindings are configured separately.
+name = "personal-website-discussion-migrations"
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "personal-website-discussion"
+database_id = "b5848862-c73f-46dd-a96b-96d9c4221ab1"
