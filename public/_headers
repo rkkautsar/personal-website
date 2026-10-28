@@ -1,0 +1,2 @@
+/blog/*
+  Cache-Control: public, max-age=0, s-maxage=7200, must-revalidate
