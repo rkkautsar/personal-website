@@ -10,17 +10,29 @@ Well, that’s a tradeoff! In this particular history, the rule made the worst f
 
 That’s what caught my attention. I can make an active decision about what I hold without spending every morning staring at a chart. And as a software engineer, I can actually write the decision down and experiment with it. Naturally, the next thing I wanted to do was build a backtest.
 
-## My backtest has a time machine
+## The backtest was cheating
 
-The rule sounded easy to code: look at the last year’s return at month-end, then buy SPY or BIL. But wait. If I need the month-end closing price to calculate the return, that close has already happened by the time I know what to buy. I can’t go back and trade at it.
+The rule sounded easy to code: look at SPY’s return over the past year at month-end, then buy SPY or BIL.
+
+But there’s a subtle problem with when the trade happens.
+
+If I use the month-end closing price to calculate the signal, I only know what to buy after the market has closed. I can’t assume I also traded at that same closing price.
+
+It sounds like a minor detail, but here’s what happened when I compared the two execution assumptions.
 
 <Demo name="demo-taa-timing" />
 
-That little mistake is called lookahead bias. It’s a nasty kind of bug: the program runs, the numbers look reasonable, and the chart might even be beautiful. It’s just quietly trading with information it didn’t have yet.
+Using the same closing price for both the signal and the trade gave me a 10.8% annualized return and a −19.6% maximum drawdown. Moving execution to the next session’s close changed those numbers to 10.3% and −24.0%.
 
-For my SPY and TIP experiments, I calculate the signal after month-end and use the **next trading session’s close** for the simulated trade. That’s still a modeling choice, not a promise that a real order would fill there. I’ve included distributions and a cost of 0.1% per purchase or sale. A switch from one ETF to another costs both sides.
+That’s lookahead bias. The code runs correctly, and the results look plausible, but the simulation is using information that wasn’t available when the trade supposedly happened.
 
-The SPY comparison covers 218 holding periods, from the July 2008 signal to the August 2026 signal. The drawdowns are measured at monthly execution dates, so a fall and recovery between those dates won’t show up. There are plenty of other ways to fool myself too: revised data, today’s index members in a historical test, missing prices. Turns out the boring parts of a backtest can be pretty important.
+For my SPY and TIP experiments, I calculate signals after month-end and use the next trading session’s close for execution. That’s still a modeling assumption, not a guarantee of what a real order would achieve. I also account for distributions and charge 0.1% per transaction side.
+
+The SPY comparison covers 218 holding periods, from the July 2008 signal through the August 2026 signal. Drawdowns are measured at monthly execution dates, so intramonth declines may not be visible.
+
+And execution timing is just one thing to get right. Historical prices can be revised, index membership changes, and fundamental data may not have been available when a simulated decision was made.
+
+Writing the rule was straightforward. Making sure the backtest was testing that rule fairly took more care.
 
 ## A great backtest, then what?
 
@@ -92,7 +104,7 @@ Then I looked at [Keller and Keuning’s longer backtest](https://jennifersjw.wo
 
 I don’t think this settles whether TIP will help in the future. It does give me another question to investigate, which is how I ended up here in the first place. There’s more to read on [cross-asset signals](https://doi.org/10.1016/j.jfineco.2019.02.011), [Faber’s moving-average research](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461), and at [Allocate Smartly](https://allocatesmartly.com/) and [TrendXplorer](https://www.trendxplorer.info/).
 
-I started by wondering if I could avoid some stock-market crashes without becoming a full-time chart watcher. I ended up writing rules, finding a time machine in my backtest, and looking at a bond ETF as a possible stock-market canary. I still don’t know which rule will look best over the next decade. But I’ve had a lot of fun exploring a part of investing I didn’t know existed.
+I started by wondering if I could avoid some stock-market crashes without becoming a full-time chart watcher. I ended up writing rules, catching my backtest cheating, and looking at a bond ETF as a possible stock-market canary. I still don’t know which rule will look best over the next decade. But I’ve had a lot of fun exploring a part of investing I didn’t know existed.
 
 <aside className="article-note">
 <strong>Data and assumptions.</strong> The examples use Yahoo Finance adjusted closes from July 2007 through September 2026; the last measured holding period exits October 1. Adjusted prices may be revised. The simulations omit taxes, spreads beyond the stated trading cost, and account-specific constraints. The conditional SPY returns are before strategy costs.
