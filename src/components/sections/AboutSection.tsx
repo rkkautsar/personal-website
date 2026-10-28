@@ -11,7 +11,7 @@ export function AboutSection() {
         At Shopee, I cut shopping cart load time by 95%. At Hopper, I cut build times from 20 to 7 minutes and deployment times from 15 to 5, while building developer tools adopted across six travel portals.
       </p>
       <div className="hero-links">
-        <a className="text-link" href="mailto:rkkautsar@gmail.com">
+        <a className="text-link" href="mailto:hello@rakha.dev">
           Get in touch <ArrowUpRight aria-hidden="true" size={15} />
         </a>
         <a className="text-link" href="/l/resume">
