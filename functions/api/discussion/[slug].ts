@@ -1,7 +1,8 @@
 import { verifyTurnstile } from '../../../server/turnstile.ts';
+import { posts } from '../../../src/blog/metadata.ts';
 interface Env { DB: D1Database; TURNSTILE_SITE_KEY?: string; TURNSTILE_SECRET_KEY?: string }
 type CommentRow = { id: string; author: string; body: string; created_at: string };
-const slugs = new Set(['the-performance-cost-of-feature-flags', 'making-shopping-cart-loads-feel-instant', 'micro-pattern-iife-and-return-early']);
+const slugs = new Set(posts.map(({ slug }) => slug));
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const tokenPattern = /^[0-9a-f]{64}$/;
 const json = (value: unknown, status = 200) => Response.json(value, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
