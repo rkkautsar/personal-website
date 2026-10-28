@@ -792,6 +792,7 @@ button:focus-visible {
 .article-prose h2, .article-prose h3 { color: var(--bright-snow); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; margin: 3rem 0 1rem; }
 .article-prose h2 { font-size: 1.8rem; }.article-prose h3 { font-size: 1.4rem; }
 .article-prose p, .article-prose ul, .article-prose ol { margin: 1.2rem 0; }
+.article-note { margin-top: 3rem; color: var(--muted, #aaa99e); font-size: .8em; line-height: 1.6; }
 .article-prose ul { list-style: disc; padding-left: 1.5rem; }.article-prose ol { list-style: decimal; padding-left: 1.5rem; }
 .article-prose img { max-width: 100%; height: auto; }
 .article-prose pre { overflow-x: auto; padding: 1.25rem; border: 1px solid var(--line); border-radius: .6rem; background: #151710; line-height: 1.6; }
@@ -800,6 +801,8 @@ button:focus-visible {
 .article-table-scroll { max-width: 100%; overflow-x: auto; margin: 2rem 0; border: 1px solid var(--line); border-radius: .65rem; }
 .article-table-scroll:focus-visible { outline: 2px solid var(--pine-blue); outline-offset: 3px; }
 .article-prose table { width: 100%; min-width: 36rem; border-collapse: collapse; font-size: .9em; line-height: 1.5; }
+.article-prose table.signal-results { min-width: 0; table-layout: fixed; }
+.article-prose .signal-results th, .article-prose .signal-results td { padding: .7rem; overflow-wrap: break-word; }
 .article-prose th, .article-prose td { padding: .9rem 1.1rem; border-bottom: 1px solid var(--line); text-align: left; }
 .article-prose th { color: var(--bright-snow); background: #ffffff0c; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: .8em; font-weight: 600; }
 .article-prose tbody tr:last-child td { border-bottom: 0; }

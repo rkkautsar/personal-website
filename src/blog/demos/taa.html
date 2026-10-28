@@ -1,0 +1,44 @@
+<template data-panel="demo-taa-main"><section class="taa" aria-label="Interactive tactical allocation experiments">
+  <div class="demo-kicker">A small historical experiment</div>
+  <h2>What if I followed SPY’s one-year return?</h2>
+  <p class="demo-intro">Choose a month to see each rule’s signal, holding, and the return that followed.</p>
+  <div id="taa-alloc" class="metrics" aria-live="polite"></div>
+  <p class="small-note">The signal chooses the holding first. The return shown is what happened afterward; it was not known when the decision was made.</p>
+  <h3>How did the rules do over the full history?</h3>
+  <div class="date-control"><label for="taa-date">Signal month <output id="taa-date-label"></output></label><input id="taa-date" type="range" min="12" max="229" value="229" aria-label="Scrub through signal months"></div>
+  <div class="charts">
+    <figure><figcaption>Portfolio value <span>100 invested at the start; same dates for every rule</span></figcaption><svg id="taa-equity" role="img" aria-label="Full sample portfolio values"></svg></figure>
+    <figure><figcaption>Drawdown <span>How far below the previous high?</span></figcaption><svg id="taa-dd" role="img" aria-label="Full sample drawdowns"></svg></figure>
+  </div>
+  <div id="taa-metrics" class="metrics" role="region" aria-label="Full history comparison"></div>
+  <p class="data-note">Signals use the trailing 12-month adjusted return at month-end and enter at the next session’s close. Each transaction costs 10 basis points per side. Adjusted-close data is from Yahoo Finance through September 2026.</p>
+</section></template>
+<template data-panel="demo-taa-crossasset"><section class="taa" aria-label="TIP canary experiment">
+  <div class="demo-kicker">One extra condition</div>
+  <h2>Would TIP change the decision?</h2>
+  <p class="demo-intro">Scrub through the history to compare the signals, allocations, and returns for each rule.</p>
+  <div id="canary-outcome" class="metrics" aria-live="polite"></div>
+  <h3>Compare the rules with buy-and-hold</h3><div class="date-control"><label for="canary-date">Signal month <output id="canary-date-label"></output></label><input id="canary-date" type="range" min="12" max="229" value="200" aria-label="Scrub through the monthly history"></div><svg id="canary-equity" role="img" aria-label="Portfolio values for SPY and TIP trend rules and buy-and-hold"></svg><div id="canary-metrics" class="metrics" aria-label="Full history performance comparison"></div>
+  <p class="data-note">Full sample curves start at 100. The marker shows the outcome of the selected signal over its following holding period. Timing and costs match the first chart.</p>
+</section></template>
+<template data-panel="demo-taa-timing"><section class="taa" aria-label="Execution timing illustrated">
+  <div class="demo-kicker">Follow the information</div>
+  <h2>The signal arrives after the price</h2>
+  <p class="demo-intro">Read left to right. Both simulations calculate the same signal. Only one waits until that signal exists before trading.</p>
+  <div class="time-axis" aria-hidden="true"><span>Month-end close</span><span>After the close</span><span>Next session’s close →</span></div>
+  <div class="time-events"><div><b>① Price becomes final</b><span>Now the return can use this closing price.</span></div><div><b>② Signal calculated</b><span>Now we know which ETF the rule chose.</span></div><div><b>③ Later execution</b><span>The choice is known before the order fills.</span></div></div>
+  <div class="trade-lane invalid"><h3>Same-close backtest</h3><div class="trade-steps"><span class="trade-event">Trade booked here</span><span class="backward-fill">← Requires a fill before the signal existed</span><span></span></div></div>
+  <div class="trade-lane valid"><h3>Next-session backtest</h3><div class="trade-steps"><span>Wait for the price</span><span>Signal known →</span><span class="trade-event">Trade booked here</span></div></div>
+  <h3>What that timing assumption changes</h3><p class="small-note">Same SPY trend rule, costs, and sample dates; only the assumed entry and exit prices differ.</p><div id="timing-impact" class="timing-impact"></div>
+  <p class="small-note">Submitting a closing-auction order earlier would require an earlier estimate of the signal. That would be a different rule from one using the final closing price.</p>
+</section></template>
+<template data-panel="demo-taa-overfit"><section class="taa" aria-label="GEM before and after publication">
+  <div class="demo-kicker">A rule meets new history</div>
+  <h2>What happened after the backtest?</h2>
+  <p class="demo-intro">Gary Antonacci published GEM in 2014. Compare the history in his original backtest with the years that followed.</p>
+  <div class="example-buttons" role="group" aria-label="Choose a time period"><button id="gem-early" type="button" aria-pressed="true">1974–2013</button><button id="gem-later" type="button" aria-pressed="false">2015–July 2026</button></div>
+  <h3 id="gem-period"></h3>
+  <svg id="gem-chart" class="wide-chart" role="img" aria-label="Portfolio values for GEM and US stocks"></svg>
+  <div id="gem-metrics" class="metrics" aria-live="polite"></div>
+  <p class="data-note">Each period starts at 100. The chart uses a logarithmic scale; drawdown uses monthly values. This independent replication uses reconstructed, spliced total-return indexes and assumes execution at the month-end signal close with no trading costs. 2014 is excluded; 2026 ends in July. Adapted from <a href="https://github.com/Petitmarius/Backtest_Strategies" target="_blank" rel="noopener noreferrer">Marius Petit’s replication</a> under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>; underlying market data is subject to its providers’ terms.</p>
+</section></template>

@@ -1,0 +1,100 @@
+I like the idea of buying the S&P 500 and leaving it alone. I like it a little less when I imagine watching half my portfolio disappear in a crash.
+
+The usual alternatives I hear about are picking stocks or trying to time the market with charts. Neither sounds like something I want to do every day. Then I came across tactical asset allocation, and found an idea that felt much more approachable: write down a rule for when to hold stocks and when to step aside.
+
+The first rule I tried was pretty simple. If SPY, an ETF tracking the S&P 500, has a positive return over the past year, hold it. Otherwise, hold BIL, a short-term Treasury bill ETF. I wanted to see what would happen if I just followed that rule every month instead of making a fresh prediction.
+
+<Demo name="demo-taa-main" />
+
+Well, that’s a tradeoff! In this particular history, the rule made the worst fall smaller, but buying and holding SPY ended up much further ahead. Getting out can help during a decline; it can also leave you watching a recovery from the sidelines.
+
+That’s what caught my attention. I can make an active decision about what I hold without spending every morning staring at a chart. And as a software engineer, I can actually write the decision down and experiment with it. Naturally, the next thing I wanted to do was build a backtest.
+
+## My backtest has a time machine
+
+The rule sounded easy to code: look at the last year’s return at month-end, then buy SPY or BIL. But wait. If I need the month-end closing price to calculate the return, that close has already happened by the time I know what to buy. I can’t go back and trade at it.
+
+<Demo name="demo-taa-timing" />
+
+That little mistake is called lookahead bias. It’s a nasty kind of bug: the program runs, the numbers look reasonable, and the chart might even be beautiful. It’s just quietly trading with information it didn’t have yet.
+
+For my SPY and TIP experiments, I calculate the signal after month-end and use the **next trading session’s close** for the simulated trade. That’s still a modeling choice, not a promise that a real order would fill there. I’ve included distributions and a cost of 0.1% per purchase or sale. A switch from one ETF to another costs both sides.
+
+The SPY comparison covers 218 holding periods, from the July 2008 signal to the August 2026 signal. The drawdowns are measured at monthly execution dates, so a fall and recovery between those dates won’t show up. There are plenty of other ways to fool myself too: revised data, today’s index members in a historical test, missing prices. Turns out the boring parts of a backtest can be pretty important.
+
+## A great backtest, then what?
+
+Once I had a chart, I wanted to know how much faith to put in it. I went looking for a rule that had been published with a long backtest, so I could also look at what came afterward.
+
+One example is Gary Antonacci’s Global Equities Momentum, or GEM, from his 2014 book. It looks at the past year’s returns. If US stocks beat Treasury bills, it holds whichever of US or international stocks did better. Otherwise, it moves to US bonds. The book’s original backtest ran from 1974 through 2013.
+
+<Demo name="demo-taa-overfit" />
+
+The difference between those two periods surprised me. In this reconstruction, GEM returns 16.6% a year in the earlier period, compared with 11.0% for US stocks. From 2015 through July 2026, it returns 8.4%, while US stocks return 13.7%. GEM’s monthly maximum drawdown is a little smaller in the later period, so the return isn’t the whole story.
+
+There’s a catch: this reconstruction uses the month-end signal close as its trade price, the very timing problem I just mentioned. It also uses reconstructed historical indexes and no trading costs. So I wouldn’t put too much weight on the exact figures. Still, seeing the later period is a useful reminder that a rule doesn’t get to choose what the market does next. This alone doesn’t prove that GEM was overfit.
+
+## Can I automate the boring part?
+
+Once I’ve decided on a rule, running it every month sounds like a job for a computer. Wait for the month to close, fetch the prices, calculate the allocation, and tell me what changed. Something roughly like this:
+
+```text
+after month_end_close:
+    prices = refresh_prices()
+    if prices.are_missing_or_stale:
+        stop_and_report()
+
+    past_year_return = prices.SPY / price_12_months_ago - 1
+    target = SPY if past_year_return > 0 else BIL
+    changes = compare(target, account.holdings)
+
+    save(prices, target, changes)
+    notify(changes)
+```
+
+Sometimes that means holding the same ETF for another month. With a portfolio of several assets, even unchanged target weights might need a rebalance because the holdings have drifted as prices moved.
+
+I built a [web app](https://cpm.rakha.dev) for this: I can choose a strategy, look through its backtest, and subscribe to a monthly email with the next allocation. I like the idea of having the routine taken care of while I spend my time thinking about the rule itself.
+
+A brokerage API could take this further and place orders too. I’d want to try that in paper trading first. Stale prices, rejected orders, and a retry that submits the same trade twice are much less entertaining with real money. I’d also need to check what actually filled against what the account was supposed to hold.
+
+## A canary for stocks?
+
+After looking at SPY’s own trend, I stumbled on a question I hadn’t thought to ask: could a completely different asset tell me something useful about when to hold SPY?
+
+Wouter Keller and JW Keuning’s [Hybrid Asset Allocation](https://jennifersjw.wordpress.com/wp-content/uploads/2024/04/ssrn-id4346906.pdf) gave me a fun example. Their simplified HAA-Simple rule uses TIP, an ETF holding Treasury Inflation-Protected Securities, as a “canary.” Even if SPY’s trend is positive, a weak TIP trend can keep the strategy out of stocks.
+
+TIP isn’t an inflation meter, though. The bonds’ principal adjusts with inflation, but the ETF’s price also moves with real interest rates and duration. That makes the question more interesting to me: does its price happen to contain information about what stocks do next?
+
+HAA-Simple measures trend a little differently from my first experiment. It averages the past 1-, 3-, 6-, and 12-month returns. When both SPY and TIP are positive, it holds SPY. Otherwise, it picks the stronger trend between BIL and IEF, an intermediate-term Treasury ETF. The [implementation notes](https://allocatesmartly.com/dr-keller-keunings-simple-variation-of-hybrid-asset-allocation/) have the details.
+
+Before comparing strategies, I wanted to see what SPY actually did after each combination of signals. Each cell has its average return over the following holding period, the number of months, and the worst drawdown after joining those selected monthly returns together.
+
+<div className="article-table-scroll">
+<table className="signal-results">
+  <thead><tr><th></th><th>TIP up</th><th>TIP down</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">SPY up</th><td>Average: 1.36%<br />Max DD: −17.48%<br />Count: 144 months</td><td>Average: −0.08%<br />Max DD: −36.78%<br />Count: 39 months</td></tr>
+    <tr><th scope="row">SPY down</th><td>Average: 2.48%<br />Max DD: −19.89%<br />Count: 16 months</td><td>Average: 0.55%<br />Max DD: −30.97%<br />Count: 19 months</td></tr>
+  </tbody>
+</table>
+</div>
+
+That’s interesting! In this sample, when TIP’s trend was up, SPY’s next return was higher on average and the joined-up drawdown was smaller, whether SPY’s own trend was up or down. But there are only 16 and 19 months in the SPY-down groups. And those drawdowns join selected months that weren’t necessarily consecutive; they aren’t the drawdowns of a portfolio I could have held.
+
+This also made me wonder: what if I followed TIP’s trend alone? The chart compares that with SPY’s trend, both trends together, and plain old buy-and-hold. All three trend rules use the same calculation and the same BIL-or-IEF choice when defensive.
+
+<Demo name="demo-taa-crossasset" />
+
+In this history, following TIP alone has the highest return: 13.6% a year, compared with 11.5% for requiring both signals. Its monthly maximum drawdown is deeper, though: 23.8% versus 17.3%. At this point I was tempted to throw out the SPY signal.
+
+Then I looked at [Keller and Keuning’s longer backtest](https://jennifersjw.wordpress.com/wp-content/uploads/2024/04/ssrn-id4346906.pdf). Over 1970–2022, their TIP-only version had a 44.7% maximum drawdown, versus 16.6% with both signals. Their annualized returns were 12.6% and 12.8%. That’s a very different picture. It also comes with a big caveat: the history starts before these ETFs existed, and even before TIPS were introduced in 1997, so the earlier data is reconstructed. The dates and assumptions differ from my chart too.
+
+I don’t think this settles whether TIP will help in the future. It does give me another question to investigate, which is how I ended up here in the first place. There’s more to read on [cross-asset signals](https://doi.org/10.1016/j.jfineco.2019.02.011), [Faber’s moving-average research](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=962461), and at [Allocate Smartly](https://allocatesmartly.com/) and [TrendXplorer](https://www.trendxplorer.info/).
+
+I started by wondering if I could avoid some stock-market crashes without becoming a full-time chart watcher. I ended up writing rules, finding a time machine in my backtest, and looking at a bond ETF as a possible stock-market canary. I still don’t know which rule will look best over the next decade. But I’ve had a lot of fun exploring a part of investing I didn’t know existed.
+
+<aside className="article-note">
+<strong>Data and assumptions.</strong> The examples use Yahoo Finance adjusted closes from July 2007 through September 2026; the last measured holding period exits October 1. Adjusted prices may be revised. The simulations omit taxes, spreads beyond the stated trading cost, and account-specific constraints. The conditional SPY returns are before strategy costs.
+</aside>
+

@@ -2,26 +2,51 @@ const demos: Record<string, () => Promise<{ init: (element: HTMLElement) => void
   'demo-flag-flicker': () => import('./demos/flag'),
   'demo-cart-rendering': () => import('./demos/rendering'),
   'demo-cart-cache': () => import('./demos/cache'),
+  'demo-taa-main': () => import('./demos/taa'),
+  'demo-taa-crossasset': () => import('./demos/taa'),
+  'demo-taa-timing': () => import('./demos/taa'),
+  'demo-taa-overfit': () => import('./demos/taa'),
 };
-const observer = new IntersectionObserver((entries) => {
-  for (const entry of entries) {
-    if (!entry.isIntersecting) continue;
-    observer.unobserve(entry.target);
-    const element = entry.target as HTMLElement;
-    const load = demos[element.dataset.demo || ''];
-    if (load) load().then(({ init }) => init(element)).catch(() => { element.textContent = 'The interactive demo could not be loaded.'; });
-  }
-}, { rootMargin: '200px' });
-document.querySelectorAll<HTMLElement>('[data-demo]').forEach(element => observer.observe(element));
 
-const discussion = document.querySelector<HTMLElement>('[data-engagement]');
-if (discussion) {
-  const discussionObserver = new IntersectionObserver((entries) => {
-    if (!entries.some(entry => entry.isIntersecting)) return;
-    discussionObserver.disconnect();
-    import('./engagement').then(({ init }) => init(discussion)).catch(() => {
-      discussion.textContent = 'Discussion could not be loaded.';
+export function init(root: ParentNode = document) {
+  const elements = [...root.querySelectorAll<HTMLElement>('[data-demo]')];
+  const supportsVisibilityObserver = 'IntersectionObserver' in window;
+  const loadElement = (element: HTMLElement) => {
+    const load = demos[element.dataset.demo || ''];
+    if (load) load().then(({ init: initialize }) => initialize(element)).catch((error) => {
+      console.error(`Could not load article demo: ${element.dataset.demo}`, error);
+      element.textContent = 'The interactive demo could not be loaded.';
     });
-  }, { rootMargin: '200px' });
-  discussionObserver.observe(discussion);
+  };
+  if (!supportsVisibilityObserver) {
+    elements.forEach(loadElement);
+  } else {
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        loadElement(entry.target as HTMLElement);
+      }
+    }, { rootMargin: '200px' });
+    elements.forEach((element) => observer.observe(element));
+  }
+
+  const discussion = root.querySelector<HTMLElement>('[data-engagement]');
+  if (discussion) {
+    const loadDiscussion = () => import('./engagement').then(({ init: initialize }) => initialize(discussion)).catch(() => {
+        discussion.textContent = 'Discussion could not be loaded.';
+      });
+    if (!supportsVisibilityObserver) {
+      void loadDiscussion();
+    } else {
+      const discussionObserver = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        discussionObserver.disconnect();
+        void loadDiscussion();
+      }, { rootMargin: '200px' });
+      discussionObserver.observe(discussion);
+    }
+  }
 }
+
+if (!import.meta.env.DEV) init();
