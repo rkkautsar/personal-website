@@ -1,2 +1,13 @@
+/
+  Vary: Accept
+
+/blog
+  Vary: Accept
+
 /blog/*
   Cache-Control: public, max-age=0, s-maxage=7200, must-revalidate
+  Vary: Accept
+
+/_markdown/*
+  Content-Type: text/markdown; charset=utf-8
+  Vary: Accept
