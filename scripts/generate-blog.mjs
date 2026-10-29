@@ -32,6 +32,9 @@ try {
   if (!indexHtml.includes(rootPlaceholder)) throw new Error('Homepage root placeholder not found.');
   await writeFile(indexPath, indexHtml.replace(rootPlaceholder, () => `<div id="root">${homeHtml}</div>`));
   const { posts } = await server.ssrLoadModule('/src/blog/metadata.ts');
+  const markdownPaths = ['/_markdown/index.md', '/_markdown/blog/index.md', ...posts.map(post => `/_markdown/blog/${post.slug}/index.md`)];
+  const headers = await readFile('dist/_headers', 'utf8');
+  await writeFile('dist/_headers', `${headers.trimEnd()}\n\n${markdownPaths.map(path => `${path}\n  Content-Type: text/markdown; charset=utf-8\n  Vary: Accept`).join('\n\n')}\n`);
   const { Article } = await server.ssrLoadModule('/src/blog/Article.tsx');
   for (const post of posts) {
     const { default: Content } = await server.ssrLoadModule(`/src/posts/${post.slug}.mdx`);
