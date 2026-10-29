@@ -1,20 +1,14 @@
 import { createServer } from 'vite';
 import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import React from 'react';
-import TurndownService from 'turndown';
-import gfm from 'turndown-plugin-gfm';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { articleMarkdown, escapeHtml as escape, toMarkdown } from './markdown.mjs';
 
 const site = 'https://rakha.dev';
-const markdown = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
-markdown.use(gfm.gfm);
-markdown.remove(['script', 'style', 'nav', 'footer']);
-markdown.addRule('svgDescription', { filter: 'svg', replacement: (_content, node) => node.querySelector('desc')?.textContent ? `\n\n${node.querySelector('desc').textContent}\n\n` : '' });
-const writeMarkdown = async (path, html) => {
+const writeMarkdown = async (path, content) => {
   await mkdir(`dist/_markdown/${path}`, { recursive: true });
-  await writeFile(`dist/_markdown/${path}/index.md`, `${markdown.turndown(html).trim()}\n`);
+  await writeFile(`dist/_markdown/${path}/index.md`, content);
 };
-const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;');
 const manifest = JSON.parse(await readFile('dist/.vite/manifest.json', 'utf8'));
 const main = manifest['index.html'];
 const css = (main.css || []).map(file => `<link rel="stylesheet" href="/${file}">`).join('');
@@ -25,7 +19,7 @@ const server = await createServer({ server: { middlewareMode: true, hmr: false, 
 try {
   const { default: Home } = await server.ssrLoadModule('/src/pages/Home.tsx');
   const homeHtml = renderToString(React.createElement(Home));
-  await writeMarkdown('', homeHtml);
+  await writeMarkdown('', toMarkdown(homeHtml));
   const indexPath = 'dist/index.html';
   const indexHtml = await readFile(indexPath, 'utf8');
   const rootPlaceholder = '<div id="root"></div>';
@@ -43,13 +37,13 @@ try {
     const minutes = readingTime(await readFile(`src/posts/${post.slug}.mdx`, 'utf8'));
     const body = renderToStaticMarkup(React.createElement(Article, { post, Content, minutes }));
     const articleContent = renderToStaticMarkup(React.createElement(Content, { components: { Demo: () => null } }));
-    await writeMarkdown(`blog/${post.slug}`, `<h1>${escape(post.title)}</h1><p>${escape(post.description)}</p>${articleContent}`);
+    await writeMarkdown(`blog/${post.slug}`, articleMarkdown(post, articleContent));
     const json = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.title, description: post.description, datePublished: post.date, author: { '@type': 'Person', name: 'Rakha Kanz Kautsar', url: site }, mainEntityOfPage: canonical }).replaceAll('<', '\\u003c');
     const html = `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#1e2019"><title>${escape(post.title)} | Rakha Kanz Kautsar</title><meta name="description" content="${escape(post.description)}"><link rel="canonical" href="${canonical}"><link rel="alternate" type="text/markdown" href="/_markdown/blog/${escape(post.slug)}/index.md"><meta property="og:type" content="article"><meta property="og:title" content="${escape(post.title)}"><meta property="og:description" content="${escape(post.description)}"><meta property="og:url" content="${canonical}"><meta name="twitter:card" content="summary"><script type="application/ld+json">${json}</script>${articleFontPreloads}${css}</head><body>${body}<script type="module" src="/${client}"></script></body></html>`;
     const dir = `dist/blog/${post.slug}`; await mkdir(dir, { recursive: true }); await writeFile(`${dir}/index.html`, html);
   }
   const list = `<div class="article-shell"><header class="article-header"><a href="/">← Rakha Kanz Kautsar</a></header><main><p class="section-label">Writing</p><h1>Notes and longer reads</h1><div class="writing-list">${posts.map(post => `<a class="writing-item" href="/blog/${escape(post.slug)}/"><span><span class="writing-title">${escape(post.title)}</span><span class="writing-description">${escape(post.description)}</span></span><span aria-hidden="true">↗</span></a>`).join('')}</div></main></div>`;
-  await writeMarkdown('blog', `<h1>Notes and longer reads</h1><ul>${posts.map(post => `<li><a href="/blog/${escape(post.slug)}/">${escape(post.title)}</a> — ${escape(post.description)}</li>`).join('')}</ul>`);
+  await writeMarkdown('blog', toMarkdown(`<h1>Notes and longer reads</h1><ul>${posts.map(post => `<li><a href="/blog/${escape(post.slug)}/">${escape(post.title)}</a> — ${escape(post.description)}</li>`).join('')}</ul>`));
   await mkdir('dist/blog', { recursive: true });
   await writeFile('dist/blog/index.html', `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Writing | Rakha Kanz Kautsar</title><meta name="description" content="Articles by Rakha Kanz Kautsar on frontend engineering and performance."><link rel="canonical" href="${site}/blog/"><link rel="alternate" type="text/markdown" href="/_markdown/blog/index.md">${interPreload}${css}</head><body>${list}</body></html>`);
   const urls = [site + '/', site + '/blog/', ...posts.map(post => `${site}/blog/${post.slug}/`)];
