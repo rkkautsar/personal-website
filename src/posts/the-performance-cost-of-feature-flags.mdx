@@ -6,9 +6,13 @@ I captured these four states on Trip.com’s homepage. First there’s a placeho
 
 The two alternatives are illustrations, not tested implementations. Playback spacing is illustrative, not a measurement of loading time.
 
-The screenshots show what changed, not why. A flag or experiment could explain the promotion switching, but so could personalization, localization, hydration, or remote content. The search field might be initialized separately; I don’t know how Trip.com builds it.
+I looked into the page after capturing this. The general homepage content supplies the first two messages. The hotel-specific content supplies the three guarantees; switching between Hotels and Flights requests a different set for each. The page’s client code can load and apply that content after an initial version is already visible. I didn’t capture the original requests during this recording, so I can’t confirm the exact sequence for that load.
+
+The search field is separately loaded too. The header waits for the search component and its resources before rendering it, which fits the late appearance in my screenshots. It’s a separately loaded module; I can’t tell whether Trip.com treats it as a micro-frontend or how its teams deploy it.
 
 A fast first paint gets something on screen, but the page can still feel unfinished while its navigation and content keep changing. Sometimes the better experience comes from avoiding a state that will immediately be replaced, not from making a request faster.
+
+I like how [web.dev frames performance around the user](https://web.dev/articles/user-centric-performance-metrics): has anything appeared, is the content useful, and can I interact with it? Visual stability is part of that experience too. One metric can’t answer all of those questions.
 
 ## Make the loading state look like the page it will become
 
@@ -18,17 +22,23 @@ In the comparison above, the middle version uses the final screenshot as a base:
 
 A placeholder still means waiting, but it can make the change less abrupt and keep the surrounding layout in place. I’d also make it clear when an interaction isn’t ready: a search-shaped skeleton is more honest than a search field that looks usable but ignores input. For the navigation item, reserving space or placing it at the edge of the group could keep existing links from moving.
 
-The search field appearing and the guarantees changing are different kinds of update. One adds an interaction that wasn’t visible before. The other replaces messages that were already complete. That second change is closer to the flag flicker I’ve encountered.
+Not every early state needs to match the final one. In my Shopee cart work, cached cart data was useful immediately, and the interface could signal that it might be stale while checking for updates. That early state helped users get on with their task. A temporary default that is immediately replaced may offer no comparable benefit.
 
-## When the wrong version appears first
+The search field appearing and the guarantees changing are different kinds of update. One adds an interaction that wasn’t visible before. The other replaces messages that were already complete. Trip.com’s content change is not evidence of a feature flag, but it reminded me of the flag flicker I’ve encountered.
+
+## A stable layout can still flicker
+
+If the replacement moves things on screen, flicker can add to Cumulative Layout Shift (CLS). A banner inserted above the page can push everything down. A button changing color in the same space can look wrong, but it doesn’t create a layout shift by itself. CLS measures movement of visible elements; it can’t tell whether the first version was the right one. [web.dev’s CLS guide](https://web.dev/articles/cls) explains what counts.
+
+In the screenshots, “List your property” appears and the App link moves. The search field appears in an empty part of the header, while the guarantees change inside the hero. Those changes are visible even without proving a layout shift; I haven’t measured CLS for them. Progressive loading can be useful when it reveals usable content; hydration and personalization updates can also be necessary. The problem is an avoidable intermediate state that the user has to watch disappear.
+
+## Feature flags can show the wrong version first
 
 I’ve seen a familiar version of this at Shopee, TikTok, and Hopper: feature flag flicker. The app paints before it has the value it should use. During an experiment, the treatment may arrive after the first frame. After a rollout, the default itself may be left behind.
 
 I like feature flags. They let us experiment, deploy code separately from releasing it, roll changes out gradually, and turn a feature off when something goes wrong. But if the app renders one version while it waits for a flag and then switches to another, the user sees that decision happening. Used without care, a flag can make an otherwise fast page feel less settled.
 
 Imagine an experiment starts with A as the default and B as the treatment. B wins and becomes permanent, but the application still starts with A. On every cold load, users see A before the flag resolves to B. The experiment is over, yet the temporary default keeps creating an unnecessary change. Updating the default and removing the obsolete flag can remove that path altogether.
-
-Not every early state is wasted. In my Shopee cart work, cached cart data was useful immediately, and the interface could signal that it might be stale while checking for updates. A temporary flag default that is immediately replaced may offer no comparable benefit. The question is whether the first state helps the user, not whether it appears early.
 
 ## What happens while flags load?
 
@@ -64,16 +74,10 @@ Without server values or a local cache, the app still needs something to render 
 
 You can hold the flag-controlled part of the page until the client is ready. A placeholder avoids showing the wrong variant and can reserve its space, although the user still has to wait for that part. I’d keep the rest of the page useful rather than hold the whole page for one flag-controlled button.
 
-## A stable layout can still flicker
-
-If the replacement moves things on screen, flicker can add to Cumulative Layout Shift (CLS). A banner inserted above the page can push everything down. A button changing color in the same space can look wrong, but it doesn’t create a layout shift by itself. CLS measures movement of visible elements; it can’t tell whether the first version was the right one. [web.dev’s CLS guide](https://web.dev/articles/cls) explains what counts.
-
-In the screenshots, “List your property” appears and the App link moves. The search field appears in an empty part of the header, while the guarantees change inside the hero. Those changes are visible even without proving a layout shift; I haven’t measured CLS for them. Progressive loading can be useful when it reveals usable content; hydration and personalization updates can also be necessary. The problem is an avoidable intermediate state that the user has to watch disappear.
-
 ## Clean up when the rollout is finished
 
 You don’t have to find every stale flag by hand. [PostHog documents cleanup workflows](https://posthog.com/docs/feature-flags/cleaning-up-stale-flags), and [Reflag offers automated cleanup](https://reflag.com/). The tool can help find old branches; the team still decides when it’s safe to remove them.
 
 Give temporary flags an owner and cleanup date. Once the decision is final, make the winning behavior unconditional and remove the losing branch. Retire the remote flag when supported clients no longer need it; old mobile versions may stick around. Cleanup finishes the rollout, but it needn’t block a shared fix for first-render flicker.
 
-I still want the control that feature flags give us. I just want to think about what people see while those flags resolve, and clean them up when they’ve done their job. A page can paint quickly and still feel slow while it keeps changing. Sometimes improving perceived performance means rendering less of the wrong intermediate UI, rather than shipping the same UI faster.
+I still want the control that feature flags give us, and I still want pages to show useful content as early as they can. But I also want to think about what happens after that first paint. If a component or assignment isn’t ready, can the page leave a stable space for it? If a rollout is finished, can we stop showing its old default? Sometimes making a page feel faster means giving it fewer unnecessary changes to make.

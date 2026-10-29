@@ -514,11 +514,10 @@ button:focus-visible {
   gap: 1rem;
   padding: 1.2rem 0;
   border-bottom: 1px solid var(--line);
-  transition: padding 200ms ease, color 200ms ease;
+  transition: color 200ms ease;
 }
 
 .writing-item:hover {
-  padding-right: 0.35rem;
   color: var(--bright-snow);
 }
 
@@ -530,6 +529,25 @@ button:focus-visible {
 .writing-item svg {
   flex: 0 0 auto;
   color: var(--pine-blue);
+}
+
+.writing-item > [aria-hidden="true"] {
+  flex: 0 0 auto;
+  transition: transform 200ms ease;
+}
+
+.writing-item:hover > [aria-hidden="true"],
+.writing-item:focus-visible > [aria-hidden="true"] {
+  transform: translate(0.2rem, -0.2rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .writing-item > [aria-hidden="true"],
+  .writing-item:hover > [aria-hidden="true"],
+  .writing-item:focus-visible > [aria-hidden="true"] {
+    transition: none;
+    transform: none;
+  }
 }
 
 .writing-title {
