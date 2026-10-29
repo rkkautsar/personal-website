@@ -74,7 +74,16 @@
   --pine-blue: #587b7f;
   --pine-text: #89afb1;
   --carbon-black: #1e2019;
+  --surface: #252720;
+  --surface-raised: #343832;
+  --surface-accent: #304345;
+  --chart-warm: #e7b680;
+  --chart-rose: #e4a0ac;
+  --chart-green: #b8cf9e;
+  --chart-blue: #9bc5cb;
+  --chart-muted: #99a391;
   --line: rgb(231 222 205 / 14%);
+  --line-strong: rgb(231 222 205 / 40%);
   --wine-position: 15% 8%;
   --pine-position: 92% 66%;
 }
