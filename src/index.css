@@ -805,6 +805,11 @@ button:focus-visible {
 .article-header { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 6rem; color: var(--bone); font-size: .9rem; }
 .article-header a, .article-prose a { color: var(--bone); text-decoration: underline; text-underline-offset: .2em; }
 .article-shell h1 { font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 700; line-height: 1.1; letter-spacing: -.035em; margin: 1rem 0 3rem; }
+.article-page h1 { margin-bottom: 1.25rem; }
+.article-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem .6rem; margin-bottom: 3rem; color: var(--bone); font-size: .875rem; line-height: 1.6; }
+.article-meta a { color: inherit; text-decoration: underline; text-underline-offset: .2em; }
+.article-meta a:hover { color: var(--bright-snow); }
+.article-meta a:focus-visible { outline: 2px solid var(--pine-blue); outline-offset: 3px; }
 .article-prose { color: var(--bone); font-family: 'XCharter', 'Times New Roman', serif; font-weight: 400; font-variant-numeric: lining-nums; line-height: 1.7; font-size: clamp(1.18rem, 1.1rem + .35vw, 1.3rem); overflow-wrap: anywhere; }
 .article-prose strong, .article-prose b { font-weight: 700; }
 .article-prose h2, .article-prose h3 { color: var(--bright-snow); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-weight: 700; line-height: 1.25; letter-spacing: -.02em; margin: 3rem 0 1rem; }

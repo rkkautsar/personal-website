@@ -30,8 +30,9 @@ try {
   const indexHtml = await readFile(indexPath, 'utf8');
   const rootPlaceholder = '<div id="root"></div>';
   if (!indexHtml.includes(rootPlaceholder)) throw new Error('Homepage root placeholder not found.');
-  await writeFile(indexPath, indexHtml.replace(rootPlaceholder, () => `<div id="root">${homeHtml}</div>`));
+  await writeFile(indexPath, indexHtml.replace('</head>', '<link rel="alternate" type="text/markdown" href="/_markdown/index.md"></head>').replace(rootPlaceholder, () => `<div id="root">${homeHtml}</div>`));
   const { posts } = await server.ssrLoadModule('/src/blog/metadata.ts');
+  const { readingTime } = await server.ssrLoadModule('/src/blog/reading-time.ts');
   const markdownPaths = ['/_markdown/index.md', '/_markdown/blog/index.md', ...posts.map(post => `/_markdown/blog/${post.slug}/index.md`)];
   const headers = await readFile('dist/_headers', 'utf8');
   await writeFile('dist/_headers', `${headers.trimEnd()}\n\n${markdownPaths.map(path => `${path}\n  Content-Type: text/markdown; charset=utf-8\n  Cache-Control: public, max-age=0, s-maxage=7200, must-revalidate\n  Vary: Accept`).join('\n\n')}\n`);
@@ -39,17 +40,18 @@ try {
   for (const post of posts) {
     const { default: Content } = await server.ssrLoadModule(`/src/posts/${post.slug}.mdx`);
     const canonical = `${site}/blog/${post.slug}/`;
-    const body = renderToStaticMarkup(React.createElement(Article, { post, Content }));
+    const minutes = readingTime(await readFile(`src/posts/${post.slug}.mdx`, 'utf8'));
+    const body = renderToStaticMarkup(React.createElement(Article, { post, Content, minutes }));
     const articleContent = renderToStaticMarkup(React.createElement(Content, { components: { Demo: () => null } }));
     await writeMarkdown(`blog/${post.slug}`, `<h1>${escape(post.title)}</h1><p>${escape(post.description)}</p>${articleContent}`);
     const json = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.title, description: post.description, datePublished: post.date, author: { '@type': 'Person', name: 'Rakha Kanz Kautsar', url: site }, mainEntityOfPage: canonical }).replaceAll('<', '\\u003c');
-    const html = `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#1e2019"><title>${escape(post.title)} | Rakha Kanz Kautsar</title><meta name="description" content="${escape(post.description)}"><link rel="canonical" href="${canonical}"><meta property="og:type" content="article"><meta property="og:title" content="${escape(post.title)}"><meta property="og:description" content="${escape(post.description)}"><meta property="og:url" content="${canonical}"><meta name="twitter:card" content="summary"><script type="application/ld+json">${json}</script>${articleFontPreloads}${css}</head><body>${body}<script type="module" src="/${client}"></script></body></html>`;
+    const html = `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#1e2019"><title>${escape(post.title)} | Rakha Kanz Kautsar</title><meta name="description" content="${escape(post.description)}"><link rel="canonical" href="${canonical}"><link rel="alternate" type="text/markdown" href="/_markdown/blog/${escape(post.slug)}/index.md"><meta property="og:type" content="article"><meta property="og:title" content="${escape(post.title)}"><meta property="og:description" content="${escape(post.description)}"><meta property="og:url" content="${canonical}"><meta name="twitter:card" content="summary"><script type="application/ld+json">${json}</script>${articleFontPreloads}${css}</head><body>${body}<script type="module" src="/${client}"></script></body></html>`;
     const dir = `dist/blog/${post.slug}`; await mkdir(dir, { recursive: true }); await writeFile(`${dir}/index.html`, html);
   }
   const list = `<div class="article-shell"><header class="article-header"><a href="/">← Rakha Kanz Kautsar</a></header><main><p class="section-label">Writing</p><h1>Notes and longer reads</h1><div class="writing-list">${posts.map(post => `<a class="writing-item" href="/blog/${escape(post.slug)}/"><span><span class="writing-title">${escape(post.title)}</span><span class="writing-description">${escape(post.description)}</span></span><span aria-hidden="true">↗</span></a>`).join('')}</div></main></div>`;
   await writeMarkdown('blog', `<h1>Notes and longer reads</h1><ul>${posts.map(post => `<li><a href="/blog/${escape(post.slug)}/">${escape(post.title)}</a> — ${escape(post.description)}</li>`).join('')}</ul>`);
   await mkdir('dist/blog', { recursive: true });
-  await writeFile('dist/blog/index.html', `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Writing | Rakha Kanz Kautsar</title><meta name="description" content="Articles by Rakha Kanz Kautsar on frontend engineering and performance."><link rel="canonical" href="${site}/blog/">${interPreload}${css}</head><body>${list}</body></html>`);
+  await writeFile('dist/blog/index.html', `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Writing | Rakha Kanz Kautsar</title><meta name="description" content="Articles by Rakha Kanz Kautsar on frontend engineering and performance."><link rel="canonical" href="${site}/blog/"><link rel="alternate" type="text/markdown" href="/_markdown/blog/index.md">${interPreload}${css}</head><body>${list}</body></html>`);
   const urls = [site + '/', site + '/blog/', ...posts.map(post => `${site}/blog/${post.slug}/`)];
   await writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(url => `<url><loc>${url}</loc></url>`).join('')}</urlset>`);
   await writeFile('dist/robots.txt', `User-agent: *\nAllow: /\nSitemap: ${site}/sitemap.xml\n`);
