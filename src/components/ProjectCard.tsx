@@ -3,14 +3,12 @@ import type { Repository } from '@/types/github';
 
 export function ProjectCard({
   project,
-  onPreview,
 }: {
   project: Repository;
-  onPreview: (project: Repository, trigger: HTMLButtonElement) => void;
 }) {
   return (
     <article className="project-card">
-      <button className="project-preview" onClick={(event) => onPreview(project, event.currentTarget)} type="button">
+      <button className="project-preview" data-project-url={project.url} type="button">
         <span className="project-title-row">
           <span className="project-title">{project.name}</span>
           <ArrowUpRight aria-hidden="true" size={17} />

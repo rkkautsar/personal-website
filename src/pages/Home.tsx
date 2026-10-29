@@ -8,14 +8,12 @@ import { ProfileRail } from '@/components/ProfileRail';
 import { SectionNav } from '@/components/SectionNav';
 import { SiteFooter } from '@/components/SiteFooter';
 import githubData from '@/data/github-profile.json';
-import { useSectionGlow } from '@/hooks/useSectionGlow';
 import type { GithubProfile } from '@/types/github';
 
 export default function Home() {
   const profile = githubData as GithubProfile;
   const user = profile.user;
   const projects = user.pinnedItems.edges.map(({ node }) => node).filter((project) => project.url);
-  useSectionGlow(true);
 
   return (
     <div className="site-shell">
