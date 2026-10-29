@@ -36,7 +36,32 @@ Users often add an item and continue browsing before opening the cart. A straigh
 
 The page started its cart GET while initialization was still running, then awaited the promise already in flight when it needed the data. I extracted the pattern into a shared library so other pages could use it. On flows such as checkout and product details, it reduced initial load time by as much as 50%.
 
-![Before and after traces comparing a cart request started after page setup with one prefetched in parallel](https://rakha.dev/demos/cart-performance/prefetch-timeline.svg)
+<svg viewBox="0 0 900 410" role="img" aria-labelledby="prefetch-title prefetch-desc" style={{ width: '100%', height: 'auto', display: 'block', margin: '1.5rem 0' }}>
+  <title id="prefetch-title">Prefetch overlaps the wait</title>
+  <desc id="prefetch-desc">Before, the cart request starts after page initialization. After, both start together, and the page reuses the request promise, waiting only if it is still pending. The trace is schematic, not to scale.</desc>
+  <rect width="900" height="410" rx="14" fill="#252720" stroke="#514f46" />
+  <text x="30" y="38" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="21" fontWeight="700">Prefetch overlaps the wait</text>
+  <text x="30" y="64" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="14">Same page work and cart request; only the start time changes.</text>
+  <text x="30" y="105" fill="#d7b799" fontFamily="system-ui, sans-serif" fontSize="14" fontWeight="700">BEFORE</text>
+  <text x="30" y="131" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="13">Page work</text>
+  <rect x="155" y="112" width="260" height="38" rx="5" fill="#405551" />
+  <text x="170" y="136" fill="#eef2e8" fontFamily="system-ui, sans-serif" fontSize="14">Initialize page · about 0.5s</text>
+  <text x="30" y="184" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="13">Cart request</text>
+  <rect x="415" y="164" width="350" height="38" rx="5" fill="#65535c" />
+  <text x="430" y="188" fill="#fff" fontFamily="system-ui, sans-serif" fontSize="14">GET cart · wait for response</text>
+  <line x1="30" y1="223" x2="870" y2="223" stroke="#514f46" />
+  <text x="30" y="253" fill="#a7c5bb" fontFamily="system-ui, sans-serif" fontSize="14" fontWeight="700">AFTER</text>
+  <text x="30" y="280" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="13">Page work</text>
+  <rect x="155" y="261" width="260" height="38" rx="5" fill="#405551" />
+  <text x="170" y="285" fill="#eef2e8" fontFamily="system-ui, sans-serif" fontSize="14">Initialize page · about 0.5s</text>
+  <text x="30" y="333" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="13">Cart request</text>
+  <rect x="155" y="313" width="350" height="38" rx="5" fill="#702632" />
+  <text x="170" y="337" fill="#fff" fontFamily="system-ui, sans-serif" fontSize="14">GET cart · already in flight</text>
+  <line x1="415" y1="255" x2="415" y2="357" stroke="#d7b799" strokeWidth="2" strokeDasharray="5 5" />
+  <text x="525" y="328" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13">Reuse the promise;</text>
+  <text x="525" y="346" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="13">wait only if it’s still pending</text>
+  <text x="30" y="387" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="12">Schematic, not to scale. Request duration varies.</text>
+</svg>
 
 Prefetching hides some request latency, but it does not keep the cache current while the user continues browsing or makes changes on another device. Refreshing after every cart change can also waste bandwidth and increase backend traffic during major campaigns, such as flash sales. That led to the less obvious part: updating a useful local cart in the background.
 
