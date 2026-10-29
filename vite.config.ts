@@ -39,5 +39,5 @@ export default defineConfig({
     },
   }],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
-  build: { manifest: true, rollupOptions: { input: { main: path.resolve(__dirname, 'index.html'), blog: path.resolve(__dirname, 'src/blog/client.ts') } } },
+  build: { manifest: true, rollupOptions: { input: { main: path.resolve(__dirname, 'index.html'), blog: path.resolve(__dirname, 'src/blog/client.ts'), articleStyles: path.resolve(__dirname, 'src/blog/article.css') } } },
 });

@@ -1,12 +1,13 @@
-import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowUpRight } from 'lucide-react';
-import { useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { ProjectCard } from '@/components/ProjectCard';
-import { ProjectDialog } from '@/components/ProjectDialog';
 import type { Repository } from '@/types/github';
+
+const ProjectDialog = lazy(() => import('@/components/ProjectDialog').then(({ ProjectDialog }) => ({ default: ProjectDialog })));
 
 export function ProjectsSection({ projects, profileUrl }: { projects: Repository[]; profileUrl: string }) {
   const [activeProject, setActiveProject] = useState<Repository | null>(null);
+  const trigger = useRef<HTMLElement | null>(null);
 
   return (
     <section className="content-section" id="projects">
@@ -15,14 +16,19 @@ export function ProjectsSection({ projects, profileUrl }: { projects: Repository
         <h2>Selected work</h2>
         <p className="section-intro">A few things I’ve built and kept pinned on GitHub.</p>
       </div>
-      <Dialog.Root open={Boolean(activeProject)} onOpenChange={(open) => !open && setActiveProject(null)}>
-        <div className="project-grid">
-          {projects.map((project) => (
-            <ProjectCard key={project.url} project={project} onPreview={setActiveProject} />
-          ))}
-        </div>
-        <ProjectDialog key={activeProject?.url ?? 'closed'} project={activeProject} />
-      </Dialog.Root>
+      <div className="project-grid">
+        {projects.map((project) => (
+          <ProjectCard key={project.url} project={project} onPreview={(selected, button) => {
+            trigger.current = button;
+            setActiveProject(selected);
+          }} />
+        ))}
+      </div>
+      {activeProject && (
+        <Suspense fallback={<p className="quiet-copy" role="status">Loading project preview…</p>}>
+          <ProjectDialog project={activeProject} onClose={() => setActiveProject(null)} trigger={trigger.current} />
+        </Suspense>
+      )}
       <a className="text-link github-link" href={profileUrl} target="_blank" rel="noreferrer">
         More on GitHub <ArrowUpRight aria-hidden="true" size={15} />
       </a>

@@ -5,8 +5,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useProjectReadme } from '@/hooks/useProjectReadme';
 import type { Repository } from '@/types/github';
+import './project-dialog.css';
 
-export function ProjectDialog({ project }: { project: Repository | null }) {
+export function ProjectDialog({ project, onClose, trigger }: { project: Repository; onClose: () => void; trigger: HTMLElement | null }) {
   const [expanded, setExpanded] = useState(false);
   const readmeState = useProjectReadme(project);
   const readme = readmeState.text.trim();
@@ -17,10 +18,14 @@ export function ProjectDialog({ project }: { project: Repository | null }) {
   }, [project?.url]);
 
   return (
+    <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
     <Dialog.Portal>
       <Dialog.Overlay className="dialog-overlay" />
       {project && (
-        <Dialog.Content className="project-dialog" aria-describedby="project-dialog-description">
+        <Dialog.Content className="project-dialog" aria-describedby="project-dialog-description" onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          trigger?.focus();
+        }}>
           <div className="dialog-heading">
             <div>
               <p className="eyebrow">Pinned repository</p>
@@ -70,5 +75,6 @@ export function ProjectDialog({ project }: { project: Repository | null }) {
         </Dialog.Content>
       )}
     </Dialog.Portal>
+    </Dialog.Root>
   );
 }

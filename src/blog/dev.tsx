@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Article, type ArticleContent } from './Article';
 import { posts } from './metadata';
 import { readingTime } from './reading-time';
+import './article.css';
 
 const contents = import.meta.glob<{ default: ArticleContent }>('../posts/*.mdx', { eager: true });
 const sources = import.meta.glob<string>('../posts/*.mdx', { eager: true, query: '?raw', import: 'default' });

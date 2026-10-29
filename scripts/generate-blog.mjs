@@ -11,7 +11,7 @@ const writeMarkdown = async (path, content) => {
 };
 const manifest = JSON.parse(await readFile('dist/.vite/manifest.json', 'utf8'));
 const main = manifest['index.html'];
-const css = (main.css || []).map(file => `<link rel="stylesheet" href="/${file}">`).join('');
+const css = [...(main.css || []), manifest['src/blog/article.css'].file].map(file => `<link rel="stylesheet" href="/${file}">`).join('');
 const interPreload = '<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>';
 const articleFontPreloads = `${interPreload}<link rel="preload" href="/fonts/xcharter-Roman.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/fonts/xcharter-Bold.woff2" as="font" type="font/woff2" crossorigin>`;
 const client = manifest['src/blog/client.ts'].file;
