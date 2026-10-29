@@ -16,8 +16,12 @@ export function ProfileRail({ name }: { name: string }) {
       <SectionNav />
 
       <div className="rail-links">
-        <a href="/l/resume">Résumé <ArrowUpRight aria-hidden="true" size={14} /></a>
-        <a href="mailto:hello@rakha.dev">Email <ArrowUpRight aria-hidden="true" size={14} /></a>
+        <a href="/l/resume">
+          Résumé <ArrowUpRight aria-hidden="true" size={14} />
+        </a>
+        <a href="mailto:hello@rakha.dev">
+          Email <ArrowUpRight aria-hidden="true" size={14} />
+        </a>
       </div>
     </aside>
   );

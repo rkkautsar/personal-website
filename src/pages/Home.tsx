@@ -13,7 +13,9 @@ import type { GithubProfile } from '@/types/github';
 export default function Home() {
   const profile = githubData as GithubProfile;
   const user = profile.user;
-  const projects = user.pinnedItems.edges.map(({ node }) => node).filter((project) => project.url);
+  const projects = user.pinnedItems.edges
+    .map(({ node }) => node)
+    .filter((project) => project.url);
 
   return (
     <div className="site-shell">

@@ -52,7 +52,11 @@ function getReadmeEndpoint(repositoryUrl: string) {
 
 export function useProjectReadme(project: Repository | null) {
   const repositoryUrl = project?.url ?? '';
-  const [state, setState] = useState<ReadmeState>({ text: '', loading: Boolean(project), unavailable: false });
+  const [state, setState] = useState<ReadmeState>({
+    text: '',
+    loading: Boolean(project),
+    unavailable: false,
+  });
 
   useEffect(() => {
     if (!repositoryUrl) {
@@ -75,7 +79,11 @@ export function useProjectReadme(project: Repository | null) {
     }
 
     if (!endpoint) {
-      setState({ text: cached?.text ?? '', loading: false, unavailable: !cached });
+      setState({
+        text: cached?.text ?? '',
+        loading: false,
+        unavailable: !cached,
+      });
       return () => controller.abort();
     }
 
@@ -84,7 +92,8 @@ export function useProjectReadme(project: Repository | null) {
       signal: controller.signal,
     })
       .then(async (response) => {
-        if (!response.ok) throw new Error(`GitHub README returned ${response.status}`);
+        if (!response.ok)
+          throw new Error(`GitHub README returned ${response.status}`);
         const text = (await response.text()).trim();
         if (!text) throw new Error('GitHub README is empty.');
 
@@ -97,7 +106,8 @@ export function useProjectReadme(project: Repository | null) {
         setState({ text, loading: false, unavailable: false });
       })
       .catch((error: unknown) => {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
         if (!cached) setState({ text: '', loading: false, unavailable: true });
       });
 

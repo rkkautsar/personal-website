@@ -8,7 +8,10 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { articleMarkdown } from './scripts/markdown.mjs';
 
-const mdxPlugin = mdx({ remarkPlugins: [remarkGfm], rehypePlugins: [rehypeHighlight] });
+const mdxPlugin = mdx({
+  remarkPlugins: [remarkGfm],
+  rehypePlugins: [rehypeHighlight],
+});
 const mdxTransform = mdxPlugin.transform;
 if (typeof mdxTransform === 'function') {
   mdxPlugin.transform = function (code, id) {
@@ -18,26 +21,53 @@ if (typeof mdxTransform === 'function') {
 }
 
 export default defineConfig({
-  plugins: [mdxPlugin, react(), {
-    name: 'dev-article-markdown',
-    configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
-        const match = new URL(req.url || '/', 'http://localhost').pathname.match(/^\/_markdown\/blog\/([^/]+)\/index\.md$/);
-        if (!match || !['GET', 'HEAD'].includes(req.method || '')) return next();
-        try {
-          const { posts } = await server.ssrLoadModule('/src/blog/metadata.ts');
-          const post = posts.find((item: { slug: string }) => item.slug === match[1]);
-          if (!post) return next();
-          const { default: Content } = await server.ssrLoadModule(`/src/posts/${post.slug}.mdx`);
-          const content = renderToStaticMarkup(React.createElement(Content, { components: { Demo: () => null } }));
-          res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
-          res.end(req.method === 'HEAD' ? undefined : articleMarkdown(post, content));
-        } catch (error) {
-          next(error);
-        }
-      });
+  plugins: [
+    mdxPlugin,
+    react(),
+    {
+      name: 'dev-article-markdown',
+      configureServer(server) {
+        server.middlewares.use(async (req, res, next) => {
+          const match = new URL(
+            req.url || '/',
+            'http://localhost'
+          ).pathname.match(/^\/_markdown\/blog\/([^/]+)\/index\.md$/);
+          if (!match || !['GET', 'HEAD'].includes(req.method || ''))
+            return next();
+          try {
+            const { posts } = await server.ssrLoadModule(
+              '/src/blog/metadata.ts'
+            );
+            const post = posts.find(
+              (item: { slug: string }) => item.slug === match[1]
+            );
+            if (!post) return next();
+            const { default: Content } = await server.ssrLoadModule(
+              `/src/posts/${post.slug}.mdx`
+            );
+            const content = renderToStaticMarkup(
+              React.createElement(Content, { components: { Demo: () => null } })
+            );
+            res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+            res.end(
+              req.method === 'HEAD' ? undefined : articleMarkdown(post, content)
+            );
+          } catch (error) {
+            next(error);
+          }
+        });
+      },
     },
-  }],
+  ],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
-  build: { manifest: true, rollupOptions: { input: { main: path.resolve(__dirname, 'index.html'), blog: path.resolve(__dirname, 'src/blog/client.ts'), articleStyles: path.resolve(__dirname, 'src/blog/article.css') } } },
+  build: {
+    manifest: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        blog: path.resolve(__dirname, 'src/blog/client.ts'),
+        articleStyles: path.resolve(__dirname, 'src/blog/article.css'),
+      },
+    },
+  },
 });

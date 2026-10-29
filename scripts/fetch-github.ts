@@ -54,12 +54,19 @@ async function main() {
     });
 
     if (!response.ok) {
-      throw new Error(`GitHub API returned ${response.status}: ${await response.text()}`);
+      throw new Error(
+        `GitHub API returned ${response.status}: ${await response.text()}`
+      );
     }
 
-    const result = (await response.json()) as { data?: T; errors?: Array<{ message: string }> };
+    const result = (await response.json()) as {
+      data?: T;
+      errors?: Array<{ message: string }>;
+    };
     if (result.errors?.length || !result.data) {
-      throw new Error(`GitHub GraphQL failed: ${result.errors?.map((error) => error.message).join('; ')}`);
+      throw new Error(
+        `GitHub GraphQL failed: ${result.errors?.map((error) => error.message).join('; ')}`
+      );
     }
     return result.data;
   }
@@ -95,7 +102,9 @@ async function main() {
   mkdirSync(publicDirectory, { recursive: true });
   writeFileSync(resolve(publicDirectory, 'github.json'), `${output}\n`);
   writeFileSync(resolve('src/data/github-profile.json'), `${output}\n`);
-  console.log('Fetched the current GitHub GraphQL profile and pinned repository metadata.');
+  console.log(
+    'Fetched the current GitHub GraphQL profile and pinned repository metadata.'
+  );
 }
 
 main().catch((error: unknown) => {

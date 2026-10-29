@@ -92,7 +92,9 @@ async function getCurrentProfile(token: string): Promise<ProfileSnapshot> {
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub API returned ${response.status}: ${await response.text()}`);
+    throw new Error(
+      `GitHub API returned ${response.status}: ${await response.text()}`
+    );
   }
 
   const result = (await response.json()) as {
@@ -101,17 +103,22 @@ async function getCurrentProfile(token: string): Promise<ProfileSnapshot> {
   };
 
   if (result.errors?.length || !result.data?.user) {
-    throw new Error(`GitHub GraphQL failed: ${result.errors?.map((error) => error.message).join('; ')}`);
+    throw new Error(
+      `GitHub GraphQL failed: ${result.errors?.map((error) => error.message).join('; ')}`
+    );
   }
 
   return result.data;
 }
 
 async function getPublishedProfile(): Promise<ProfileSnapshot | null> {
-  const response = await fetch(`${publishedSnapshotUrl}?refresh=${Date.now()}`, {
-    cache: 'no-store',
-    headers: { 'Cache-Control': 'no-cache' },
-  });
+  const response = await fetch(
+    `${publishedSnapshotUrl}?refresh=${Date.now()}`,
+    {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' },
+    }
+  );
   if (!response.ok) return null;
 
   const data = (await response.json()) as ProfileSnapshot;
@@ -124,9 +131,12 @@ export default {
     const published = await getPublishedProfile();
     const githubChanged =
       !published ||
-      JSON.stringify(comparableProfile(current)) !== JSON.stringify(comparableProfile(published));
+      JSON.stringify(comparableProfile(current)) !==
+        JSON.stringify(comparableProfile(published));
     if (!githubChanged) {
-      console.log('Pinned GitHub profile is unchanged; skipping the Pages deployment.');
+      console.log(
+        'Pinned GitHub profile is unchanged; skipping the Pages deployment.'
+      );
       return;
     }
 
@@ -139,13 +149,17 @@ export default {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ branch: 'master' }),
-      },
+      }
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to trigger Pages deployment: ${await response.text()}`);
+      throw new Error(
+        `Failed to trigger Pages deployment: ${await response.text()}`
+      );
     }
 
-    console.log(`Pages deployment triggered. GitHub changed: ${githubChanged}.`);
+    console.log(
+      `Pages deployment triggered. GitHub changed: ${githubChanged}.`
+    );
   },
 };
