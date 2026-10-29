@@ -24,17 +24,11 @@ A placeholder still means waiting, but it can make the change less abrupt and ke
 
 Not every early state needs to match the final one. In my Shopee cart work, cached cart data was useful immediately, and the interface could signal that it might be stale while checking for updates. That early state helped users get on with their task. A temporary default that is immediately replaced may offer no comparable benefit.
 
-The search field appearing and the guarantees changing are different kinds of update. One adds an interaction that wasn’t visible before. The other replaces messages that were already complete. Trip.com’s content change is not evidence of a feature flag, but it reminded me of the flag flicker I’ve encountered.
-
-## A stable layout can still flicker
-
-If the replacement moves things on screen, flicker can add to Cumulative Layout Shift (CLS). A banner inserted above the page can push everything down. A button changing color in the same space can look wrong, but it doesn’t create a layout shift by itself. CLS measures movement of visible elements; it can’t tell whether the first version was the right one. [web.dev’s CLS guide](https://web.dev/articles/cls) explains what counts.
-
-In the screenshots, “List your property” appears and the App link moves. The search field appears in an empty part of the header, while the guarantees change inside the hero. Those changes are visible even without proving a layout shift; I haven’t measured CLS for them. Progressive loading can be useful when it reveals usable content; hydration and personalization updates can also be necessary. The problem is an avoidable intermediate state that the user has to watch disappear.
+The search field appearing and the guarantees changing are different kinds of update. One adds an interaction that wasn’t visible before. The other replaces messages that were already complete. If an update moves elements around, it can contribute to [Cumulative Layout Shift (CLS)](https://web.dev/articles/cls). But the guarantees can change without moving the surrounding layout, and the user still sees one set of messages replaced by another. CLS alone won’t capture that flicker.
 
 ## Feature flags can show the wrong version first
 
-I’ve seen a familiar version of this at Shopee, TikTok, and Hopper: feature flag flicker. The app paints before it has the value it should use. During an experiment, the treatment may arrive after the first frame. After a rollout, the default itself may be left behind.
+Trip.com’s content change isn’t evidence of a feature flag, but it reminded me of a similar flicker I’ve seen at Shopee, TikTok, and Hopper. The app paints before it has the flag value it should use. During an experiment, the treatment may arrive after the first frame. After a rollout, the default itself may be left behind.
 
 I like feature flags. They let us experiment, deploy code separately from releasing it, roll changes out gradually, and turn a feature off when something goes wrong. But if the app renders one version while it waits for a flag and then switches to another, the user sees that decision happening. Used without care, a flag can make an otherwise fast page feel less settled.
 

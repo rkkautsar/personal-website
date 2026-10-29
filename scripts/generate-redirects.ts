@@ -16,4 +16,5 @@ const lines = Object.entries(links)
     return `/l/${slug} ${destination} 301`;
   });
 
+lines.push('/blog/the-performance-cost-of-feature-flags/ /blog/the-performance-cost-of-visual-instability/ 301');
 writeFileSync(resolve(root, 'dist/_redirects'), `${lines.join('\n')}\n`);
