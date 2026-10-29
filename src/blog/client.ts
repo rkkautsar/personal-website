@@ -1,5 +1,6 @@
 const demos: Record<string, () => Promise<{ init: (element: HTMLElement) => void }>> = {
   'demo-flag-flicker': () => import('./demos/flag'),
+  'demo-trip-rendering': () => import('./demos/trip-rendering'),
   'demo-cart-rendering': () => import('./demos/rendering'),
   'demo-cart-cache': () => import('./demos/cache'),
   'demo-taa-main': () => import('./demos/taa'),

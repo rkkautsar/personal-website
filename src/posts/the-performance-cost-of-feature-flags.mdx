@@ -1,8 +1,40 @@
-I’ve seen feature flag flicker at Shopee, TikTok, and Hopper. The app paints before it has the value it should use. After a rollout, that can mean an old default. During a live experiment, it can mean the treatment arrives after the first frame. Either way, users see one version, then another.
+The page renders fast, but then it changes several times as it loads.
 
-Removing a stale default can fix one flag, but it won’t prevent flicker in the next experiment. I’d rather fix what the app does while flags are loading.
+I captured these four states on Trip.com’s homepage. First there’s a placeholder and incomplete navigation. Then the hero and “List your property” appear, followed by the search field. Finally, “Secure payment” and “We’re here 24/7” change to three different guarantees.
 
-Try the demo first. It shows four first-render strategies in one purchase flow: server bootstrap, cache + SWR, a fallback, and waiting for flags. Assignment B adds express delivery and moves the purchase row. In Cache + SWR, replay after the first run to see the fresh assignment load immediately. The delay is simulated; the demo doesn’t measure CLS.
+<Demo name="demo-trip-rendering" />
+
+The two alternatives are illustrations, not tested implementations. Playback spacing is illustrative, not a measurement of loading time.
+
+The screenshots show what changed, not why. A flag or experiment could explain the promotion switching, but so could personalization, localization, hydration, or remote content. The search field might be initialized separately; I don’t know how Trip.com builds it.
+
+A fast first paint gets something on screen, but the page can still feel unfinished while its navigation and content keep changing. Sometimes the better experience comes from avoiding a state that will immediately be replaced, not from making a request faster.
+
+## Make the loading state look like the page it will become
+
+When the final UI can’t be ready immediately, I want the loading state to leave room for it. In the Trip.com screenshots, the hero starts gray before turning blue, the search field arrives in an empty part of the header, and “List your property” pushes the App link aside.
+
+In the comparison above, the middle version uses the final screenshot as a base: it reserves space for the search field and navigation item, and shows separate skeletons for the travel icons and promotional messages. The blue hero is already there. It assumes the hero is available early, but the neutral placeholders don’t assume the final messages are ready. The last version shows the final state from the start, if that were possible.
+
+A placeholder still means waiting, but it can make the change less abrupt and keep the surrounding layout in place. I’d also make it clear when an interaction isn’t ready: a search-shaped skeleton is more honest than a search field that looks usable but ignores input. For the navigation item, reserving space or placing it at the edge of the group could keep existing links from moving.
+
+The search field appearing and the guarantees changing are different kinds of update. One adds an interaction that wasn’t visible before. The other replaces messages that were already complete. That second change is closer to the flag flicker I’ve encountered.
+
+## When the wrong version appears first
+
+I’ve seen a familiar version of this at Shopee, TikTok, and Hopper: feature flag flicker. The app paints before it has the value it should use. During an experiment, the treatment may arrive after the first frame. After a rollout, the default itself may be left behind.
+
+I like feature flags. They let us experiment, deploy code separately from releasing it, roll changes out gradually, and turn a feature off when something goes wrong. But if the app renders one version while it waits for a flag and then switches to another, the user sees that decision happening. Used without care, a flag can make an otherwise fast page feel less settled.
+
+Imagine an experiment starts with A as the default and B as the treatment. B wins and becomes permanent, but the application still starts with A. On every cold load, users see A before the flag resolves to B. The experiment is over, yet the temporary default keeps creating an unnecessary change. Updating the default and removing the obsolete flag can remove that path altogether.
+
+Not every early state is wasted. In my Shopee cart work, cached cart data was useful immediately, and the interface could signal that it might be stale while checking for updates. A temporary flag default that is immediately replaced may offer no comparable benefit. The question is whether the first state helps the user, not whether it appears early.
+
+## What happens while flags load?
+
+Removing a stale default can fix a finished rollout, but it won’t prevent flicker in the next experiment. I also look at what the app does while flags are loading.
+
+The demo shows four first-render strategies in one purchase flow: server bootstrap, cache + SWR, a fallback, and waiting for flags. Assignment B adds express delivery and moves the purchase row. In Cache + SWR, replay after the first run to see the fresh assignment load immediately. The delay is simulated; the demo doesn’t measure CLS.
 
 <Demo name="demo-flag-flicker" />
 
@@ -14,7 +46,7 @@ Many apps don’t render a personalized page on the server. They serve the same 
 
 ## 2\. Reuse local values in a static shell
 
-**This is my go-to most of the time, when it's a static app.**
+**This is usually my go-to for a static app.**
 
 When the HTML can’t include the user’s assignment, I keep the last flag values in the browser’s local cache, under that user’s identity. On startup, the app reads that user’s saved values before rendering. It then asks the flag service for current values in the background. When the response comes back, the app updates the cache and uses the fresh values. That second request and update is what “revalidate” means here.
 
@@ -30,14 +62,18 @@ Without server values or a local cache, the app still needs something to render 
 
 ## 4\. Wait when a wrong value is worse than a delay
 
-You can hold the flag-controlled part of the page until the client is ready. That avoids showing the wrong variant, but leaves a placeholder while the service responds. I wouldn’t hold the whole page for one flag-controlled button.
+You can hold the flag-controlled part of the page until the client is ready. A placeholder avoids showing the wrong variant and can reserve its space, although the user still has to wait for that part. I’d keep the rest of the page useful rather than hold the whole page for one flag-controlled button.
 
-## Flicker can affect CLS
+## A stable layout can still flicker
 
 If the replacement moves things on screen, flicker can add to Cumulative Layout Shift (CLS). A banner inserted above the page can push everything down. A button changing color in the same space can look wrong, but it doesn’t create a layout shift by itself. CLS measures movement of visible elements; it can’t tell whether the first version was the right one. [web.dev’s CLS guide](https://web.dev/articles/cls) explains what counts.
+
+In the screenshots, “List your property” appears and the App link moves. The search field appears in an empty part of the header, while the guarantees change inside the hero. Those changes are visible even without proving a layout shift; I haven’t measured CLS for them. Progressive loading can be useful when it reveals usable content; hydration and personalization updates can also be necessary. The problem is an avoidable intermediate state that the user has to watch disappear.
 
 ## Clean up when the rollout is finished
 
 You don’t have to find every stale flag by hand. [PostHog documents cleanup workflows](https://posthog.com/docs/feature-flags/cleaning-up-stale-flags), and [Reflag offers automated cleanup](https://reflag.com/). The tool can help find old branches; the team still decides when it’s safe to remove them.
 
 Give temporary flags an owner and cleanup date. Once the decision is final, make the winning behavior unconditional and remove the losing branch. Retire the remote flag when supported clients no longer need it; old mobile versions may stick around. Cleanup finishes the rollout, but it needn’t block a shared fix for first-render flicker.
+
+I still want the control that feature flags give us. I just want to think about what people see while those flags resolve, and clean them up when they’ve done their job. A page can paint quickly and still feel slow while it keeps changing. Sometimes improving perceived performance means rendering less of the wrong intermediate UI, rather than shipping the same UI faster.
