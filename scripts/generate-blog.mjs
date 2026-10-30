@@ -29,7 +29,7 @@ try {
   const { readingTime } = await server.ssrLoadModule('/src/blog/reading-time.ts');
   const markdownPaths = ['/_markdown/index.md', '/_markdown/blog/index.md', ...posts.map(post => `/_markdown/blog/${post.slug}/index.md`)];
   const headers = await readFile('dist/_headers', 'utf8');
-  await writeFile('dist/_headers', `${headers.trimEnd()}\n\n${markdownPaths.map(path => `${path}\n  Content-Type: text/markdown; charset=utf-8\n  Cache-Control: public, max-age=0, s-maxage=7200, must-revalidate\n  Vary: Accept`).join('\n\n')}\n`);
+  await writeFile('dist/_headers', `${headers.trimEnd()}\n\n${markdownPaths.map(path => `${path}\n  Content-Type: text/markdown; charset=utf-8\n  Vary: Accept`).join('\n\n')}\n`);
   const { Article } = await server.ssrLoadModule('/src/blog/Article.tsx');
   for (const post of posts) {
     const { default: Content } = await server.ssrLoadModule(`/src/posts/${post.slug}.mdx`);
