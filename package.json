@@ -39,6 +39,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240512.0",
     "@csstools/postcss-relative-color-syntax": "^2.0.16",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.0.0",
     "@types/react": "^18",
@@ -49,6 +50,8 @@
     "lint-staged": "^17.6.0",
     "postcss": "^8.4.38",
     "prettier": "^3.9.10",
+    "satori": "^0.63.2",
+    "sharp": "^0.33.5",
     "tailwindcss": "^3.4.1",
     "turndown": "^7.2.4",
     "turndown-plugin-gfm": "^1.0.2",

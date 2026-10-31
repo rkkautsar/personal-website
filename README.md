@@ -14,7 +14,7 @@ npm run dev
 ## Content
 
 - `shortlinks.json` is the source of truth for `/l/:slug` links. The build generates Cloudflare Pages redirects from it.
-- Posts live in `src/posts/*.mdx` with metadata in `src/blog/metadata.ts`. The build renders static HTML under `/blog/<slug>/`, including metadata, a sitemap, and build-time syntax highlighting. For the full blog preview, run `npm run build`, `npm run d1:local:migrate` once, and `npm run preview`. This uses a local D1 database; the Vite development server serves the portfolio only.
+- Posts live in `src/posts/*.mdx` with metadata in `src/blog/metadata.ts`. The build renders static HTML under `/blog/<slug>/`, including metadata, a sitemap, build-time syntax highlighting, and a generated Open Graph card at `/og/blog/<slug>.png` (1200×630, from `scripts/og-image.mjs`). For the full blog preview, run `npm run build`, `npm run d1:local:migrate` once, and `npm run preview`. This uses a local D1 database; the Vite development server serves the portfolio plus on-demand Markdown and Open Graph routes, while blog HTML is only produced by the build.
 - Interactive demos are adapted from `public/demos/` into `src/blog/demos/` and loaded when they approach the viewport. Update both copies when changing a demo.
 - GitHub profile, the current pinned repositories, and their README content are fetched by `scripts/fetch-github.ts` at dev-server start and build time. The site does not use a checked-in GitHub snapshot.
 

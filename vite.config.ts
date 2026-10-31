@@ -4,6 +4,7 @@ import mdx from '@mdx-js/rollup';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
 import path from 'path';
+import { readFile } from 'node:fs/promises';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { articleMarkdown } from './scripts/markdown.mjs';
@@ -51,6 +52,58 @@ export default defineConfig({
             res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
             res.end(
               req.method === 'HEAD' ? undefined : articleMarkdown(post, content)
+            );
+          } catch (error) {
+            next(error);
+          }
+        });
+      },
+    },
+    {
+      name: 'dev-og-images',
+      configureServer(server) {
+        server.middlewares.use(async (req, res, next) => {
+          const match = new URL(
+            req.url || '/',
+            'http://localhost'
+          ).pathname.match(/^\/og\/blog\/([^/]+)\.png$/);
+          if (!match || !['GET', 'HEAD'].includes(req.method || ''))
+            return next();
+          try {
+            const { posts } = await server.ssrLoadModule(
+              '/src/blog/metadata.ts'
+            );
+            const post = posts.find(
+              (item: { slug: string }) => item.slug === match[1]
+            );
+            if (!post) {
+              res.statusCode = 404;
+              res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+              return res.end('Unknown post');
+            }
+            const { readingTime } = await server.ssrLoadModule(
+              '/src/blog/reading-time.ts'
+            );
+            const { renderOgImage } = (await server.ssrLoadModule(
+              '/scripts/og-image.mjs'
+            )) as {
+              renderOgImage: (post: {
+                title: string;
+                description: string;
+                date: string;
+                minutes: number;
+              }) => Promise<Uint8Array>;
+            };
+            const source = await readFile(
+              path.resolve(__dirname, `src/posts/${post.slug}.mdx`),
+              'utf8'
+            );
+            res.setHeader('Content-Type', 'image/png');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.end(
+              req.method === 'HEAD'
+                ? undefined
+                : await renderOgImage({ ...post, minutes: readingTime(source) })
             );
           } catch (error) {
             next(error);

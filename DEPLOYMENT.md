@@ -1,6 +1,6 @@
 # Deployment
 
-The website is a static Vite build published to Cloudflare Pages. GitHub profile and pinned repository metadata are fetched from GitHub GraphQL during each build and bundled with the site. A repository README is fetched from GitHub's public REST API only when its project dialog opens; the browser keeps it for a week and revalidates expired content in the background. Blog posts are authored as local MDX and rendered into static HTML during the build. Shortlinks are repository content.
+The website is a static Vite build published to Cloudflare Pages. GitHub profile and pinned repository metadata are fetched from GitHub GraphQL during each build and bundled with the site. A repository README is fetched from GitHub's public REST API only when its project dialog opens; the browser keeps it for a week and revalidates expired content in the background. Blog posts are authored as local MDX and rendered into static HTML during the build. Each post also gets a generated 1200×630 Open Graph card at `/og/blog/<slug>.png`, referenced from the page metadata and structured data. Shortlinks are repository content.
 
 ## Pages
 

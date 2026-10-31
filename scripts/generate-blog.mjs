@@ -3,6 +3,7 @@ import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import React from 'react';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { articleMarkdown, escapeHtml as escape, toMarkdown } from './markdown.mjs';
+import { ogImageSize, renderOgImage } from './og-image.mjs';
 
 const site = 'https://rakha.dev';
 const writeMarkdown = async (path, content) => {
@@ -31,15 +32,18 @@ try {
   const headers = await readFile('dist/_headers', 'utf8');
   await writeFile('dist/_headers', `${headers.trimEnd()}\n\n${markdownPaths.map(path => `${path}\n  Content-Type: text/markdown; charset=utf-8\n  Vary: Accept`).join('\n\n')}\n`);
   const { Article } = await server.ssrLoadModule('/src/blog/Article.tsx');
+  await mkdir('dist/og/blog', { recursive: true });
   for (const post of posts) {
     const { default: Content } = await server.ssrLoadModule(`/src/posts/${post.slug}.mdx`);
     const canonical = `${site}/blog/${post.slug}/`;
     const minutes = readingTime(await readFile(`src/posts/${post.slug}.mdx`, 'utf8'));
+    const ogImage = `${site}/og/blog/${post.slug}.png`;
+    await writeFile(`dist/og/blog/${post.slug}.png`, await renderOgImage({ ...post, minutes }));
     const body = renderToStaticMarkup(React.createElement(Article, { post, Content, minutes }));
     const articleContent = renderToStaticMarkup(React.createElement(Content, { components: { Demo: () => null } }));
     await writeMarkdown(`blog/${post.slug}`, articleMarkdown(post, articleContent));
-    const json = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.title, description: post.description, datePublished: post.date, author: { '@type': 'Person', name: 'Rakha Kanz Kautsar', url: site }, mainEntityOfPage: canonical }).replaceAll('<', '\\u003c');
-    const html = `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#1e2019"><title>${escape(post.title)} | Rakha Kanz Kautsar</title><meta name="description" content="${escape(post.description)}"><link rel="canonical" href="${canonical}"><link rel="alternate" type="text/markdown" href="/_markdown/blog/${escape(post.slug)}/index.md"><meta property="og:type" content="article"><meta property="og:title" content="${escape(post.title)}"><meta property="og:description" content="${escape(post.description)}"><meta property="og:url" content="${canonical}"><meta name="twitter:card" content="summary"><script type="application/ld+json">${json}</script>${articleFontPreloads}${css}</head><body>${body}<script type="module" src="/${client}"></script></body></html>`;
+    const json = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.title, description: post.description, datePublished: post.date, author: { '@type': 'Person', name: 'Rakha Kanz Kautsar', url: site }, mainEntityOfPage: canonical, image: ogImage }).replaceAll('<', '\\u003c');
+    const html = `<!doctype html><html lang="en" class="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#1e2019"><title>${escape(post.title)} | Rakha Kanz Kautsar</title><meta name="description" content="${escape(post.description)}"><link rel="canonical" href="${canonical}"><link rel="alternate" type="text/markdown" href="/_markdown/blog/${escape(post.slug)}/index.md"><meta property="og:type" content="article"><meta property="og:title" content="${escape(post.title)}"><meta property="og:description" content="${escape(post.description)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${ogImage}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="${ogImageSize.width}"><meta property="og:image:height" content="${ogImageSize.height}"><meta property="og:image:alt" content="${escape(post.title)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${ogImage}"><script type="application/ld+json">${json}</script>${articleFontPreloads}${css}</head><body>${body}<script type="module" src="/${client}"></script></body></html>`;
     const dir = `dist/blog/${post.slug}`; await mkdir(dir, { recursive: true }); await writeFile(`${dir}/index.html`, html);
   }
   const list = `<div class="article-shell"><header class="article-header"><a href="/">← Rakha Kanz Kautsar</a></header><main><p class="section-label">Writing</p><h1>Notes and longer reads</h1><div class="writing-list">${posts.map(post => `<a class="writing-item" href="/blog/${escape(post.slug)}/"><span><span class="writing-title">${escape(post.title)}</span><span class="writing-description">${escape(post.description)}</span></span><span aria-hidden="true">↗</span></a>`).join('')}</div></main></div>`;
