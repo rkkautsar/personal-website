@@ -1,6 +1,6 @@
 export const posts = [
   {
-    slug: 'the-download-chrome-refused-to-trust',
+    slug: 'why-chrome-blocked-my-download',
     title: 'Why Did Chrome Block My Download When Everything Should Be Secure?',
     description:
       'The connection was secure. The download was not, according to Chrome.',
