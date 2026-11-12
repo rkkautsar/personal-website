@@ -20,6 +20,7 @@
     "check:worker": "tsc -p worker/cron/tsconfig.json",
     "d1:local:migrate": "wrangler d1 migrations apply personal-website-local --local --config wrangler.local.toml",
     "check:discussion": "tsc --noEmit --skipLibCheck --target ES2022 --module ESNext --moduleResolution bundler --allowImportingTsExtensions --types @cloudflare/workers-types functions/api/discussion/[slug].ts functions/dashboard/comments.ts functions/dashboard/index.ts",
+    "check:shortlinks": "tsc --noEmit --skipLibCheck --target ES2022 --module ESNext --moduleResolution bundler --esModuleInterop --resolveJsonModule --types @cloudflare/workers-types functions/l/[slug].ts",
     "test:discussion": "node --experimental-strip-types --test test/discussion-security.test.mjs"
   },
   "lint-staged": {
