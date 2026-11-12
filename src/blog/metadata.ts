@@ -1,5 +1,12 @@
 export const posts = [
   {
+    slug: 'the-download-chrome-refused-to-trust',
+    title: 'Why Did Chrome Block My Download When Everything Should Be Secure?',
+    description:
+      'The connection was secure. The download was not, according to Chrome.',
+    date: '2026-11-13',
+  },
+  {
     slug: 'somewhere-between-active-and-passive-investing',
     title: 'Somewhere Between Active and Passive Investing',
     description: 'What if investing came with an if statement?',

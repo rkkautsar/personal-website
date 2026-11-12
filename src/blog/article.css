@@ -29,6 +29,7 @@
 .article-prose :not(pre) > code { background: #ffffff12; padding: .15em .3em; border-radius: .25em; }
 .article-table-scroll { max-width: 100%; overflow-x: auto; margin: 2rem 0; border: 1px solid var(--line); border-radius: .65rem; }
 .article-table-scroll:focus-visible { outline: 2px solid var(--pine-text); outline-offset: 3px; }
+.diagram-scroll { max-width: 100%; overflow-x: auto; margin: 1.5rem 0; }
 .article-prose table { width: 100%; min-width: 36rem; border-collapse: collapse; font-size: .9em; line-height: 1.5; }
 .article-prose table.signal-results { min-width: 0; table-layout: fixed; }
 .article-prose .signal-results th, .article-prose .signal-results td { padding: .7rem; overflow-wrap: break-word; }

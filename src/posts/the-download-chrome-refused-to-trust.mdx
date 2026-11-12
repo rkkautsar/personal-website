@@ -1,0 +1,108 @@
+I was testing my résumé shortlink, `rakha.dev/l/resume`, by typing it directly into Chrome's address bar. The download was blocked. The message said the site wasn't using a secure connection. Everything in that path should have been secure: the site is HTTPS only, and the file lives on Google Drive.
+
+The link redirected with a 301 to a Google Drive download link.
+
+## Everything looked fine
+
+Did I misconfigure the redirection or the HTTPS config? I checked the certificate, then checked it again. `curl -I` on the HTTP address returned a redirect to HTTPS, and the HTTPS response carried a strict-transport-security header. `.dev` is on the HSTS preload list, so Chrome upgrades the initial HTTP address before sending a request. The redirects after that stayed on HTTPS.
+
+Every check passed, and the warning kept appearing.
+
+Then I found a URL that had nothing to do with my site. In a fresh Chrome profile, [`http://go.dev/dl/go1.22.0.src.tar.gz`](http://go.dev/dl/go1.22.0.src.tar.gz) is blocked with the same message. Go ahead, click it in Chrome to see the block yourself. The `https://` form of the same URL downloads normally. That gave me a reproduction outside my setup; whatever was happening was not unique to my server or certificate.
+
+<aside className="article-note">
+<strong>Before you click.</strong> The file is a 25 MB Go source archive. If your browser doesn't apply the check, it will download it.
+</aside>
+
+## Typing `https://` made it work
+
+The difference was what I typed. `rakha.dev/l/resume` failed. `https://rakha.dev/l/resume` worked.
+
+I started debugging it with an agent: reproduce the block, then trace the root cause. Was it my redirect configuration, or, as I suspected, bad defaults in the browser? We ran the failing and working URLs side by side in fresh profiles, and the agent traced the decision to [Chromium's download classifier](https://github.com/chromium/chromium/blob/main/chrome/browser/download/insecure_download_blocking.cc), which builds an initiator from the download item or the tab and checks the URL chain with a "potentially trustworthy" predicate. I did not read the whole file myself; I used that to form a hypothesis and tested it against the cases.
+
+On desktop, Chrome resolves an address without a scheme to `http://`. Because of HSTS, it upgrades that address before any request leaves the browser, so the request is HTTPS. The original address stays in the record the browser keeps for the navigation, though, and the download check looks at that record.
+
+<div className="diagram-scroll">
+<svg viewBox="0 0 640 250" role="img" aria-labelledby="chain-title chain-desc" style={{ width: '100%', minWidth: '640px', height: 'auto', display: 'block' }}>
+  <title id="chain-title">Chrome adds http:// before HSTS upgrades it</title>
+  <desc id="chain-desc">I typed rakha.dev/l/resume without a scheme. Chrome supplied http, then HSTS changed it to https before any network request. My site returned a 301 redirect over HTTPS to a Google Drive file URL. The original HTTP address remained in the navigation record, although no HTTP request was sent.</desc>
+  <rect width="640" height="250" rx="14" fill="#252720" stroke="#514f46" />
+  <text x="16" y="32" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="17" fontWeight="700">Chrome adds http:// before HSTS upgrades it</text>
+
+  <rect x="16" y="54" width="108" height="150" rx="6" fill="#1e2019" stroke="#514f46" />
+  <text x="24" y="72" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="10">1</text>
+  <text x="24" y="94" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">What I typed</text>
+  <text x="24" y="126" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">rakha.dev</text>
+  <text x="24" y="142" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">/l/resume</text>
+
+  <line x1="126" y1="129" x2="133" y2="129" stroke="#514f46" strokeWidth="2" />
+  <polygon points="133,123 139,129 133,135" fill="#514f46" />
+
+  <rect x="141" y="54" width="108" height="150" rx="6" fill="#373024" stroke="#d7b799" strokeWidth="2" />
+  <text x="149" y="72" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="10">2</text>
+  <text x="149" y="94" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">Chrome adds</text>
+  <text x="149" y="108" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">a scheme</text>
+  <rect x="149" y="118" width="54" height="18" rx="3" fill="#702632" />
+  <text x="154" y="131" fill="#eee8d8" fontFamily="ui-monospace, monospace" fontSize="11">http://</text>
+  <text x="149" y="152" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">URL only,</text>
+  <text x="149" y="168" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">not sent</text>
+
+  <line x1="251" y1="129" x2="258" y2="129" stroke="#514f46" strokeWidth="2" />
+  <polygon points="258,123 264,129 258,135" fill="#514f46" />
+
+  <rect x="266" y="54" width="108" height="150" rx="6" fill="#405551" stroke="#514f46" />
+  <text x="274" y="72" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="10">3</text>
+  <text x="274" y="94" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">HSTS</text>
+  <text x="274" y="108" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">upgrades it</text>
+  <text x="274" y="130" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">https://</text>
+  <text x="274" y="146" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">rakha.dev</text>
+  <text x="274" y="162" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">/l/resume</text>
+
+  <line x1="376" y1="129" x2="383" y2="129" stroke="#514f46" strokeWidth="2" />
+  <polygon points="383,123 389,129 383,135" fill="#514f46" />
+
+  <rect x="391" y="54" width="108" height="150" rx="6" fill="#1e2019" stroke="#514f46" />
+  <text x="399" y="72" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="10">4</text>
+  <text x="399" y="94" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">My site</text>
+  <text x="399" y="108" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">redirects</text>
+  <text x="399" y="130" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">301</text>
+  <text x="399" y="146" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">to Google</text>
+  <text x="399" y="162" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">Drive</text>
+
+  <line x1="501" y1="129" x2="508" y2="129" stroke="#514f46" strokeWidth="2" />
+  <polygon points="508,123 514,129 508,135" fill="#514f46" />
+
+  <rect x="516" y="54" width="108" height="150" rx="6" fill="#1e2019" stroke="#514f46" />
+  <text x="524" y="72" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="10">5</text>
+  <text x="524" y="94" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">File</text>
+  <text x="524" y="108" fill="#eee8d8" fontFamily="system-ui, sans-serif" fontSize="13" fontWeight="700">destination</text>
+  <text x="524" y="130" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">Google Drive</text>
+  <text x="524" y="146" fill="#bebdb1" fontFamily="system-ui, sans-serif" fontSize="11">HTTPS</text>
+
+  <text x="16" y="232" fill="#a7c5bb" fontFamily="system-ui, sans-serif" fontSize="12">The HTTP URL stays in the record, even though no HTTP request is sent.</text>
+</svg>
+</div>
+
+The classifier does not consult whether HSTS upgraded the connection.
+
+## Why the check exists
+
+Downloads persist, and someone may run the file later. If an attacker can change the page that starts a download, they can change where its link points, even when the eventual download uses HTTPS. Google's [post announcing the policy](https://security.googleblog.com/2020/02/protecting-users-from-insecure_6.html) names the risk directly: an insecure download can be swapped for malware, or read by an eavesdropper.
+
+Ignoring an HTTP starting address just because the file eventually arrives over HTTPS would be too broad. A server-side HTTP-to-HTTPS redirect still involves a plaintext request. In my reproduction, the upgrade happened inside the browser before any request.
+
+## What I changed
+
+I could have left it there and told people to type `https://`. I wanted the shortlink to work when typed as it is, without requiring the scheme.
+
+The short links on my site now return two different responses. Ordinary requests get a redirect. Navigations without a website initiator, like typing an address or opening a bookmark, get a small HTML page instead.
+
+It comes down to one header, `Sec-Fetch-Site: none`, which browsers set when a page didn't start the navigation. Everything else gets the redirect. If you type the URL directly, you get a small page that redirects to the destination with JavaScript, so the record no longer begins with `http://`.
+
+I wrote the function with the same agent and checked both cases in a fresh profile and against the deployed site. Typing the URL now downloads the file. The cost is one extra hop for typed and bookmarked links.
+
+I had been checking the certificate and HTTPS redirects. What I had missed was the difference between the address I typed and the request Chrome actually sent.
+
+I [filed it](https://issues.chromium.org/issues/584973367) on the Chromium issue tracker, with the `go.dev` reproduction. At the time of writing, it's still fresh and unconfirmed.
+
+I don't know whether Chromium will change the check. Until then, the link works with `https://`, and it works without the scheme because of the new handoff. That is more effort than a short link should need, but it is the part I could fix.
