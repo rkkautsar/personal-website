@@ -7,7 +7,8 @@ export const onRequest: PagesFunction<Record<string, never>, 'slug'> = ({
   params,
 }) => {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-  const destination = slug ? destinations[slug] : undefined;
+  const destination =
+    slug && Object.hasOwn(destinations, slug) ? destinations[slug] : undefined;
   if (!destination)
     return new Response('Not found', {
       status: 404,
