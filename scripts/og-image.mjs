@@ -33,9 +33,9 @@ const card = {
   height: 630,
 };
 
-// 1200x630 is the standard Open Graph card size. Bump to 2 for retina output
-// if a card needs to stay sharp when a viewer upscales it.
-const OG_SCALE = 1;
+// 1200x630 is the standard Open Graph card size; 2x keeps text sharp in link previews.
+
+const OG_SCALE = 2;
 
 export const ogImageSize = {
   width: card.width * OG_SCALE,
