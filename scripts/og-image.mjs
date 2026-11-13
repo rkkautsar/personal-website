@@ -206,16 +206,9 @@ export async function renderOgImage(post, { scale = OG_SCALE } = {}) {
   const rendered = new Resvg(svg, {
     fitTo: { mode: 'width', value: card.width * scale },
   }).render();
-  // Resvg emits RGBA PNGs, which carry a mostly constant alpha channel and
-  // cost ~40% more bytes. A 256-colour palette round-trips the flat text and
-  // smooth gradient without visible banding and keeps edges sharp.
+  // JPEG avoids the indexed-colour PNG that some link-preview pipelines treat
+  // as a small thumbnail. Text is still crisp at 2x.
   return sharp(rendered.asPng())
-    .png({
-      palette: true,
-      colours: 256,
-      dither: 1,
-      compressionLevel: 9,
-      effort: 10,
-    })
+    .jpeg({ quality: 92, mozjpeg: true })
     .toBuffer();
 }
